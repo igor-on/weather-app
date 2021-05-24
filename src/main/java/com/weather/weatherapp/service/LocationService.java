@@ -56,7 +56,10 @@ public class LocationService {
         return locationRepository.find(id);
     }
 
-    public Location findLocation(String cityName) throws NoLocationFoundException {
+    public Location findLocation(String cityName) throws NoLocationFoundException, InvalidDataException {
+        if(stringValueIsNotValid(cityName)){
+            throw new InvalidDataException("Given city name is not correct");
+        }
         return locationRepository.findByName(cityName);
     }
 }
