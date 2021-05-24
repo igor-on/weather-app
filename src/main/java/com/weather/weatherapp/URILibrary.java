@@ -18,4 +18,14 @@ public class URILibrary {
                 .addParameter("lang", "pl")
                 .build();
     }
+
+    public static URI getCurrentWeatherForGeographicCoordinatesOpenWeatherURI(double lat, double lon) throws URISyntaxException {
+        return new URIBuilder(OPEN_WEATHER_URL)
+                .addParameter("lat", String.valueOf(lat))
+                .addParameter("lon", String.valueOf(lon))
+                .addParameter("appid", FIRST_API_KEY)
+                .addParameter("units", "metric")
+                .addParameter("lang", "pl")
+                .build();
+    }
 }

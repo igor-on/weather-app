@@ -28,4 +28,17 @@ public class WeatherController {
             return mapper.writeValueAsString(new Error(e.getMessage()));
         }
     }
+
+    public String addSavedLocationWeatherByCoordinates(long id) throws JsonProcessingException {
+        try {
+            final Weather createdByCoordinatesLocationWeather = weatherService.getAndSaveWeatherByGeographicCoordinates(id);
+
+            final WeatherDTO locationWeatherDTO = mapToWeatherDTO(createdByCoordinatesLocationWeather);
+
+            System.out.println("little validation(or not) if your geographical coordinates were strange.. :)");
+            return mapper.writeValueAsString(locationWeatherDTO);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
 }

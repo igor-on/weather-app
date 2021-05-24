@@ -37,6 +37,17 @@ public class WeatherClient {
         return mapToWeather(apiOpenWeatherDTO);
     }
 
+    public Weather getWeatherForGeographicCoordinates(double lat, double lon)
+            throws IOException, InterruptedException, URISyntaxException {
+
+        HttpResponse<String> response = sendRequestAndGetResponse(URILibrary.getCurrentWeatherForGeographicCoordinatesOpenWeatherURI(lat, lon));
+        String openWeatherResponseBody = response.body();
+
+        ApiOpenWeatherDTO apiOpenWeatherDTO = mapper.readValue(openWeatherResponseBody, ApiOpenWeatherDTO.class);
+
+        return mapToWeather(apiOpenWeatherDTO);
+    }
+
     private HttpResponse<String> sendRequestAndGetResponse(URI uri) throws IOException, InterruptedException {
         final HttpRequest request = HttpRequest.newBuilder()
                 .GET()

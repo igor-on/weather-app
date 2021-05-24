@@ -25,4 +25,12 @@ public class WeatherService {
 
         return weatherRepository.save(foundLocationWeather);
     }
+
+    public Weather getAndSaveWeatherByGeographicCoordinates(long id) throws NoLocationFoundException, InterruptedException, IOException, URISyntaxException {
+        Location foundLocation = locationService.findLocationById(id);
+        Weather foundLocationWeather
+                = weatherClient.getWeatherForGeographicCoordinates(foundLocation.getLatitude(), foundLocation.getLongitude());
+
+        return weatherRepository.save(foundLocationWeather);
+    }
 }
