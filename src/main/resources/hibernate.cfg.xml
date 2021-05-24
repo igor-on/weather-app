@@ -6,5 +6,6 @@
         <property name="connection.username"></property>
         <property name="connection.password"></property>
         <property name="hbm2ddl.auto">validate</property>
+        <mapping class="com.weather.weatherapp.dto.Location"/>
     </session-factory>
 </hibernate-configuration>
