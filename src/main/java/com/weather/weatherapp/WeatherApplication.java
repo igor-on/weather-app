@@ -6,6 +6,7 @@ import com.weather.weatherapp.controller.FileController;
 import com.weather.weatherapp.controller.LocationController;
 import com.weather.weatherapp.controller.WeatherController;
 import com.weather.weatherapp.endpoint.LocationEndpoints;
+import com.weather.weatherapp.endpoint.WeatherEndpoints;
 import com.weather.weatherapp.repository.LocationRepository;
 import com.weather.weatherapp.repository.WeatherRepository;
 import com.weather.weatherapp.service.FileService;
@@ -44,8 +45,10 @@ public class WeatherApplication {
 
 
         final LocationEndpoints locationEndpoints = new LocationEndpoints(locationController, server);
+        final WeatherEndpoints weatherEndpoints = new WeatherEndpoints(weatherController, server);
 
         locationEndpoints.runApp();
+        weatherEndpoints.runApp();
         server.start();
 
 
