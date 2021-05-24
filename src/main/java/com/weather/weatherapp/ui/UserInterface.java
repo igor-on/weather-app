@@ -48,7 +48,7 @@ public class UserInterface {
                     showAllSavedWeathers();
                     break;
                 case 7:
-                    updateSavedLocation();
+                    updateLocation();
                     break;
                 case 0:
                     return;
@@ -145,7 +145,7 @@ public class UserInterface {
         }
     }
 
-    private void updateSavedLocation() {
+    private void updateLocation() {
         System.out.println("What are you want to update?");
         System.out.println("1. City name");
         System.out.println("2. Geographical Coordination");
@@ -161,7 +161,7 @@ public class UserInterface {
                     System.out.println("Write new city name for your location");
                     scanner.nextLine();
                     String cityName = scanner.nextLine();
-                    System.out.println(locationController.updateSavedLocationCityName(selectedId, cityName));
+                    System.out.println(locationController.updateLocationCityName(selectedId, cityName));
                     break;
                 case 2:
                     System.out.println("Write new coordination for your location");
@@ -169,20 +169,20 @@ public class UserInterface {
                     double latitude = scanner.nextDouble();
                     System.out.println("Write longitude");
                     double longitude = scanner.nextDouble();
-                    System.out.println(locationController.updateSavedLocationCoords(selectedId, latitude, longitude));
+                    System.out.println(locationController.updateLocationCoords(selectedId, latitude, longitude));
                     break;
 
                 case 3:
                     System.out.println("Write new region for your location");
                     scanner.nextLine();
                     final String region = scanner.nextLine();
-                    System.out.println(locationController.updateSavedLocationRegion(selectedId, region));
+                    System.out.println(locationController.updateLocationRegion(selectedId, region));
                     break;
                 case 4:
                     System.out.println("Write new country for your location");
                     scanner.nextLine();
                     final String country = scanner.nextLine();
-                    System.out.println(locationController.updateSavedLocationCountry(selectedId, country));
+                    System.out.println(locationController.updateLocationCountry(selectedId, country));
                     break;
                 default:
                     System.out.println("There's no options like this!");

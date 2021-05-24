@@ -53,7 +53,7 @@ public class LocationController {
         }
     }
 
-    public String updateSavedLocationCityName(long id, String cityName) throws JsonProcessingException {
+    public String updateLocationCityName(long id, String cityName) throws JsonProcessingException {
         try {
             final Location updatedLocation = service.updateLocationCityName(id, cityName);
             return mapper.writeValueAsString(updatedLocation);
@@ -62,7 +62,7 @@ public class LocationController {
         }
     }
 
-    public String updateSavedLocationCoords(long id, double lat, double lon) throws JsonProcessingException {
+    public String updateLocationCoords(long id, double lat, double lon) throws JsonProcessingException {
         try {
             final Location updatedLocation = service.updateLocationCoords(id, lat, lon);
             return mapper.writeValueAsString(updatedLocation);
@@ -71,7 +71,7 @@ public class LocationController {
         }
     }
 
-    public String updateSavedLocationRegion(long selectedId, String region) throws JsonProcessingException {
+    public String updateLocationRegion(long selectedId, String region) throws JsonProcessingException {
         try {
             final Location updatedLocation = service.updateLocationRegion(selectedId, region);
             return mapper.writeValueAsString(updatedLocation);
@@ -80,7 +80,7 @@ public class LocationController {
         }
     }
 
-    public String updateSavedLocationCountry(long id, String country) throws JsonProcessingException {
+    public String updateLocationCountry(long id, String country) throws JsonProcessingException {
         try {
             final Location updatedLocation = service.updateLocationCountry(id, country);
             return mapper.writeValueAsString(updatedLocation);
