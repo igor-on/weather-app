@@ -61,7 +61,7 @@ class FileServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"   ", "", "12345678901234567890123456789012345678901"})
+    @ValueSource(strings = {"   ", "", "123456789012345678901234567890123456789012"})
     void thatWriteLocationsToFileThrowsInvalidDataException(String value) {
         List<Location> locationList = new ArrayList<>();
         locationList.add(LOCATION);
@@ -95,7 +95,7 @@ class FileServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"   ", "", "12345678901234567890123456789012345678901"})
+    @ValueSource(strings = {"   ", "", "123456789012345678901234567890123456789012"})
     void thatWriteWeathersToFileThrowsInvalidDataException(String value) {
         List<Weather> locationList = new ArrayList<>();
         locationList.add(LOCATION_WEATHER);
@@ -151,7 +151,7 @@ class FileServiceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"   ", "", "12345678901234567890123456789012345678901"})
+    @ValueSource(strings = {"   ", "", "123456789012345678901234567890123456789012"})
     void thatGetWeathersFromFileThrowsInvalidException(String value) {
         Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.getWeathersFromFile(value));
 
