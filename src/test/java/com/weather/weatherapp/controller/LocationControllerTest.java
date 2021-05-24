@@ -1,9 +1,9 @@
 package com.weather.weatherapp.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weather.weatherapp.dto.Location;
 import com.weather.weatherapp.exception.InvalidDataException;
+import com.weather.weatherapp.exception.NoLocationFoundException;
 import com.weather.weatherapp.service.LocationService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LocationControllerTest {
@@ -65,5 +65,25 @@ class LocationControllerTest {
         final String actualJson = controller.addLocation(null, LATITUDE, LONGITUDE, REGION, COUNTRY);
 
         assertThat(actualJson).contains("\"message\" : \"City name can't be empty\"");
+    }
+
+    @Test
+    void thatRemoveLocationWorksCorrectly() throws NoLocationFoundException, JsonProcessingException {
+        doNothing().when(locationService).removeLocation(IDENTIFIER);
+
+        final String actual = controller.removeLocation(IDENTIFIER);
+
+        assertThat(actual).isEqualTo("Location deleted correctly");
+        verify(locationService, times(1)).removeLocation(IDENTIFIER);
+    }
+
+    @Test
+    void thatRemoveLocationThrowsNoLocationFoundException() throws NoLocationFoundException, JsonProcessingException {
+        doThrow(new NoLocationFoundException("There is no location with given id: " + IDENTIFIER)).when(locationService).removeLocation(IDENTIFIER);
+
+        final String actualJson = controller.removeLocation(IDENTIFIER);
+
+        assertThat(actualJson).contains("\"message\" : \"There is no location with given id: 2\"");
+        verify(locationService, times(1)).removeLocation(IDENTIFIER);
     }
 }

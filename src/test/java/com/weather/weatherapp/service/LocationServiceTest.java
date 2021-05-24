@@ -2,6 +2,7 @@ package com.weather.weatherapp.service;
 
 import com.weather.weatherapp.dto.Location;
 import com.weather.weatherapp.exception.InvalidDataException;
+import com.weather.weatherapp.exception.NoLocationFoundException;
 import com.weather.weatherapp.repository.LocationRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -100,5 +101,44 @@ class LocationServiceTest {
                 () -> service.createAndSaveLocation(CITY_NAME, LATITUDE, LONGITUDE, REGION, "   "));
 
         assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given country is not correct");
+    }
+
+    @Test
+    void thatRemoveLocationWorksCorrectly() throws NoLocationFoundException {
+        when(locationRepository.find(anyLong())).thenReturn(LOCATION);
+        doNothing().when(locationRepository).remove(LOCATION);
+
+        service.removeLocation(IDENTIFIER);
+
+        verify(locationRepository, times(1)).remove(LOCATION);
+        verify(locationRepository, times(1)).find(anyLong());
+    }
+
+    @Test
+    void thatRemoveLocationThrowsNoLocationFoundException() throws NoLocationFoundException {
+        doThrow(NoLocationFoundException.class).when(locationRepository).find(anyLong());
+
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.removeLocation(anyLong()));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
+    }
+
+    @Test
+    void thatFindLocationByIdWorksCorrectly() throws NoLocationFoundException {
+        when(locationRepository.find(anyLong())).thenReturn(LOCATION);
+
+        final Location actual = service.findLocationById(anyLong());
+
+        assertThat(actual.getCityName()).isEqualTo("Miami");
+        verify(locationRepository, times(1)).find(anyLong());
+    }
+
+    @Test
+    void thatFindLocationByIdThrowsNoLocationFoundException() throws NoLocationFoundException {
+        when(locationRepository.find(anyLong())).thenThrow(NoLocationFoundException.class);
+
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.findLocationById(anyLong()));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
     }
 }
