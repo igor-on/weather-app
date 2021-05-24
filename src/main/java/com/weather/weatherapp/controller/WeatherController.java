@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.current.WeatherDTO;
 import com.weather.weatherapp.service.WeatherService;
+import com.weather.weatherapp.exception.Error;
 import lombok.RequiredArgsConstructor;
 
 import static com.weather.weatherapp.mapper.WeatherDTOMapper.mapToWeatherDTO;
@@ -29,7 +30,7 @@ public class WeatherController {
         }
     }
 
-    public String addSavedLocationWeatherByCoordinates(long id) throws JsonProcessingException {
+    public String saveLocationWeatherByCoordinates(long id) throws JsonProcessingException {
         try {
             final Weather createdByCoordinatesLocationWeather = weatherService.getAndSaveWeatherByGeographicCoordinates(id);
 

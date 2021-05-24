@@ -117,7 +117,7 @@ public class UserInterface {
                     //You don't want to choose your location by its coords
                     System.out.println("Choose location by its geographical coordinates id");
                     long selectedId = scanner.nextLong();
-                    System.out.println(weatherController.addSavedLocationWeatherByCoordinates(selectedId));
+                    System.out.println(weatherController.saveLocationWeatherByCoordinates(selectedId));
                     break;
                 default:
                     System.out.println("There's no option like this!");

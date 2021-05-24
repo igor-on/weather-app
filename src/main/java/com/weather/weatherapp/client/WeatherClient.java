@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weather.weatherapp.URILibrary;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.current.ApiOpenWeatherDTO;
+import com.weather.weatherapp.dto.current.ApiWeatherStackDTO;
 
 import java.io.IOException;
 import java.net.URI;
@@ -32,9 +33,13 @@ public class WeatherClient {
         HttpResponse<String> response = sendRequestAndGetResponse(URILibrary.getCurrentWeatherForCityNameOpenWeatherURI(cityName));
         String openWeatherResponseBody = response.body();
 
-        ApiOpenWeatherDTO apiOpenWeatherDTO = mapper.readValue(openWeatherResponseBody, ApiOpenWeatherDTO.class);
+        response = sendRequestAndGetResponse(URILibrary.getCurrentWeatherForCityNameWeatherStackURI(cityName));
+        String weatherStackResponseBody = response.body();
 
-        return mapToWeather(apiOpenWeatherDTO);
+        ApiOpenWeatherDTO apiOpenWeatherDTO = mapper.readValue(openWeatherResponseBody, ApiOpenWeatherDTO.class);
+        ApiWeatherStackDTO apiWeatherStackDTO = mapper.readValue(weatherStackResponseBody, ApiWeatherStackDTO.class);
+
+        return mapToWeather(apiOpenWeatherDTO, apiWeatherStackDTO);
     }
 
     public Weather getWeatherForGeographicCoordinates(double lat, double lon)
@@ -43,9 +48,13 @@ public class WeatherClient {
         HttpResponse<String> response = sendRequestAndGetResponse(URILibrary.getCurrentWeatherForGeographicCoordinatesOpenWeatherURI(lat, lon));
         String openWeatherResponseBody = response.body();
 
-        ApiOpenWeatherDTO apiOpenWeatherDTO = mapper.readValue(openWeatherResponseBody, ApiOpenWeatherDTO.class);
+        response = sendRequestAndGetResponse(URILibrary.getCurrentWeatherForGeographicCoordinatesWeatherStackURI(lat, lon));
+        String weatherStackResponseBody = response.body();
 
-        return mapToWeather(apiOpenWeatherDTO);
+        ApiOpenWeatherDTO apiOpenWeatherDTO = mapper.readValue(openWeatherResponseBody, ApiOpenWeatherDTO.class);
+        ApiWeatherStackDTO apiWeatherStackDTO = mapper.readValue(weatherStackResponseBody, ApiWeatherStackDTO.class);
+
+        return mapToWeather(apiOpenWeatherDTO, apiWeatherStackDTO);
     }
 
     private HttpResponse<String> sendRequestAndGetResponse(URI uri) throws IOException, InterruptedException {
