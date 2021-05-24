@@ -247,7 +247,7 @@ class LocationControllerTest {
         LOCATION.setCountry(newCountry);
         when(locationService.updateLocationCountry(IDENTIFIER, newCountry)).thenReturn(LOCATION);
 
-        final String actualJson = controller.updateLocationCityName(IDENTIFIER, newCountry);
+        final String actualJson = controller.updateLocationCountry(IDENTIFIER, newCountry);
 
         assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
         assertThat(actualJson).contains("\"region\" : null,");
