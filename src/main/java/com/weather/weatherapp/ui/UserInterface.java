@@ -17,6 +17,7 @@ public class UserInterface {
             System.out.println("Welcome in Weather APP, what do you want to do?");
             System.out.println("1. Add new localization");
             System.out.println("2. Remove localization");
+            System.out.println("3. Find localization data by city name");
             System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
@@ -26,6 +27,9 @@ public class UserInterface {
                     break;
                 case 2:
                     removeLocation();
+                    break;
+                case 3:
+                    findLocationByCityName();
                     break;
                 case 0:
                     return;
@@ -63,6 +67,17 @@ public class UserInterface {
             System.out.println(locationController.removeLocation(selectedId));
         } catch (JsonProcessingException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    private void findLocationByCityName() {
+        System.out.println("Write localization city name you want to find");
+        scanner.nextLine();
+        String selectedCity = scanner.nextLine();
+        try {
+            System.out.println(locationController.findLocationByCityName(selectedCity));
+        } catch (JsonProcessingException e) {
+            System.out.println("JSON CO JEST");
         }
     }
 }

@@ -55,4 +55,8 @@ public class LocationService {
     public Location findLocationById(long id) throws NoLocationFoundException {
         return locationRepository.find(id);
     }
+
+    public Location findLocation(String cityName) throws NoLocationFoundException {
+        return locationRepository.findByName(cityName);
+    }
 }
