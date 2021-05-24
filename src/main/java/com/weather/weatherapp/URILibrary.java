@@ -44,7 +44,6 @@ public class URILibrary {
                 .addParameter("access_key", SECOND_API_KEY)
                 .addParameter("query", String.format("%s,%s", lat, lon))
                 .addParameter("units", "m")
-
                 .build();
     }
 }
