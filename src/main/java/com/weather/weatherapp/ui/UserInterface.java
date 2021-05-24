@@ -26,6 +26,7 @@ public class UserInterface {
             System.out.println("6. Show all saved weathers");
             System.out.println("7. Update localization");
             System.out.println("8. Get weather forecast for available localizations");
+            System.out.println("9. Get statistical weather for last month");
             System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
@@ -53,6 +54,9 @@ public class UserInterface {
                     break;
                 case 8:
                     getLocationForecast();
+                    break;
+                case 9:
+                    getStatisticalData();
                     break;
                 case 0:
                     return;
@@ -208,6 +212,20 @@ public class UserInterface {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             System.out.println("JSON NOOOO");
+        }
+    }
+
+    private void getStatisticalData() {
+        showAllSavedWeathers();
+        System.out.println("Write location city name for which you want to get statistical data");
+        scanner.nextLine();
+        final String selectedLocation = scanner.nextLine();
+        try {
+            System.out.println("Statistical data from last month");
+            System.out.println(weatherController.getLocationWeatherStatisticalData(selectedLocation));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            System.out.println("JOSOOON");
         }
     }
 }

@@ -3,6 +3,7 @@ package com.weather.weatherapp.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.weather.weatherapp.dto.StatisticalWeatherDTO;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.current.WeatherDTO;
 import com.weather.weatherapp.dto.forecast.Forecast;
@@ -71,6 +72,16 @@ public class WeatherController {
             final ForecastDTO weatherForecastDTO = mapToForecastDTO(weatherForecast);
 
             return mapper.writeValueAsString(weatherForecastDTO);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
+
+    public String getLocationWeatherStatisticalData(String cityName) throws JsonProcessingException {
+        try {
+            final StatisticalWeatherDTO statisticalData = weatherService.getStatisticalData(cityName);
+
+            return mapper.writeValueAsString(statisticalData);
         } catch (Exception e) {
             return mapper.writeValueAsString(new Error(e.getMessage()));
         }

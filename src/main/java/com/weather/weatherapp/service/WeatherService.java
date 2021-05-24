@@ -2,6 +2,7 @@ package com.weather.weatherapp.service;
 
 import com.weather.weatherapp.client.WeatherClient;
 import com.weather.weatherapp.dto.Location;
+import com.weather.weatherapp.dto.StatisticalWeatherDTO;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.forecast.Forecast;
 import com.weather.weatherapp.exception.InvalidDataException;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,5 +91,36 @@ public class WeatherService {
         return forecastDays.stream()
                 .filter(singleDay -> singleDay.getForecastDate().toString().equals(stringDate))
                 .collect(Collectors.toList());
+    }
+
+    public StatisticalWeatherDTO getStatisticalData(String cityName) throws InvalidDataException, NoLocationFoundException {
+
+        if(locationService.stringValueIsNotValid(cityName)){
+            throw new InvalidDataException("Given city name is incorrect");
+        }
+
+        final List<Object[]> results = weatherRepository.findStatisticalWeatherDataFromLastMonthByCityName(cityName);
+        List<StatisticalWeatherDTO> list = new ArrayList<>();
+
+        if(results.size() == 0){
+            throw new NoLocationFoundException("There is no location with given city name: " + cityName);
+        }
+        if(results.size() > 1){
+            throw new InvalidDataException("There can't be more than one result");
+        }
+
+        for (Object[] location : results) {
+            final StatisticalWeatherDTO build = StatisticalWeatherDTO.builder()
+                    .cityName((String) location[0])
+                    .temperature((double) location[1])
+                    .humidity((double) location[2])
+                    .pressure((double) location[3])
+                    .windSpeed((double) location[4])
+                    .windDegree((double) location[5])
+                    .build();
+            list.add(build);
+        }
+
+        return list.get(0);
     }
 }
