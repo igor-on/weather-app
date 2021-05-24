@@ -3,6 +3,7 @@ package com.weather.weatherapp.service;
 import com.weather.weatherapp.client.WeatherClient;
 import com.weather.weatherapp.dto.Location;
 import com.weather.weatherapp.dto.Weather;
+import com.weather.weatherapp.dto.forecast.Forecast;
 import com.weather.weatherapp.exception.InvalidDataException;
 import com.weather.weatherapp.exception.NoLocationFoundException;
 import com.weather.weatherapp.repository.WeatherRepository;
@@ -10,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class WeatherService {
@@ -37,5 +41,53 @@ public class WeatherService {
 
     public List<Weather> getAllLocationsWeathers() {
         return weatherRepository.findAll();
+    }
+
+    public Forecast getWeatherForecast(Long id, String selectedDate) throws NoLocationFoundException, URISyntaxException, IOException, InterruptedException, InvalidDataException {
+        final Location foundLocation = locationService.findLocationById(id);
+
+        final Forecast locationForecast
+                = weatherClient.getForecastForGeographicCoordinates(foundLocation.getLatitude(), foundLocation.getLongitude());
+
+        setUpForecastDate(selectedDate, foundLocation, locationForecast);
+
+        return locationForecast;
+    }
+
+    private void setUpForecastDate(String selectedDate, Location foundLocation, Forecast locationForecast) throws InvalidDataException {
+        locationForecast.setCityName(foundLocation.getCityName());
+
+        if (selectedDate.isBlank()) {
+            setUpDefaultDate(locationForecast);
+        } else {
+            setUpSelectedByUserDate(selectedDate, locationForecast);
+        }
+    }
+
+    private void setUpDefaultDate(Forecast locationForecast) {
+        LocalDate date = LocalDate.now().plusDays(1);
+        final String defaultDate = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        final List<Forecast.ForecastDay> defaultForecast =
+                filterForecastDays(defaultDate, locationForecast.getForecastDaysList());
+
+        locationForecast.setForecastDaysList(defaultForecast);
+    }
+
+    private void setUpSelectedByUserDate(String selectedDate, Forecast locationForecast) throws InvalidDataException {
+        final List<Forecast.ForecastDay> selectedByUserForecast =
+                filterForecastDays(selectedDate, locationForecast.getForecastDaysList());
+
+        if (selectedByUserForecast.isEmpty()) {
+            throw new InvalidDataException("Wrong data provided");
+        }
+
+        locationForecast.setForecastDaysList(selectedByUserForecast);
+    }
+
+    private List<Forecast.ForecastDay> filterForecastDays(String stringDate, List<Forecast.ForecastDay> forecastDays) {
+        return forecastDays.stream()
+                .filter(singleDay -> singleDay.getForecastDate().toString().equals(stringDate))
+                .collect(Collectors.toList());
     }
 }

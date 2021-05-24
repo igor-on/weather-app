@@ -6,6 +6,8 @@ import com.weather.weatherapp.URILibrary;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.current.ApiOpenWeatherDTO;
 import com.weather.weatherapp.dto.current.ApiWeatherStackDTO;
+import com.weather.weatherapp.dto.forecast.ApiOpenWeatherForecastDTO;
+import com.weather.weatherapp.dto.forecast.Forecast;
 
 import java.io.IOException;
 import java.net.URI;
@@ -14,6 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static com.weather.weatherapp.mapper.ForecastMapper.mapToForecast;
 import static com.weather.weatherapp.mapper.WeatherMapper.mapToWeather;
 
 public class WeatherClient {
@@ -55,6 +58,17 @@ public class WeatherClient {
         ApiWeatherStackDTO apiWeatherStackDTO = mapper.readValue(weatherStackResponseBody, ApiWeatherStackDTO.class);
 
         return mapToWeather(apiOpenWeatherDTO, apiWeatherStackDTO);
+    }
+
+    public Forecast getForecastForGeographicCoordinates(double lat, double lon)
+            throws IOException, InterruptedException, URISyntaxException {
+
+        final HttpResponse<String> response = sendRequestAndGetResponse(URILibrary.getForecastForGeographicCoordinatesURI(lat, lon));
+
+        final ApiOpenWeatherForecastDTO apiOpenWeatherForecastDTO =
+                mapper.readValue(response.body(), ApiOpenWeatherForecastDTO.class);
+
+        return mapToForecast(apiOpenWeatherForecastDTO);
     }
 
     private HttpResponse<String> sendRequestAndGetResponse(URI uri) throws IOException, InterruptedException {

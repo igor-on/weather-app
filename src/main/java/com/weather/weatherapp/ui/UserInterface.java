@@ -25,6 +25,7 @@ public class UserInterface {
             System.out.println("5. Save current weather for available localizations");
             System.out.println("6. Show all saved weathers");
             System.out.println("7. Update localization");
+            System.out.println("8. Get weather forecast for available localizations");
             System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
@@ -49,6 +50,9 @@ public class UserInterface {
                     break;
                 case 7:
                     updateLocation();
+                    break;
+                case 8:
+                    getLocationForecast();
                     break;
                 case 0:
                     return;
@@ -189,6 +193,21 @@ public class UserInterface {
             }
         } catch (JsonProcessingException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    private void getLocationForecast() {
+        showAllSavedLocations();
+        System.out.println("Write location id for which you want to check weather forecast");
+        final Long selectedId = scanner.nextLong();
+        System.out.println("Select date for the forecast check(max 7 days +)(optional)");
+        System.out.println("Required format: yyyy-MM-dd");
+        final String selectedDate = scanner.nextLine();
+        try {
+            System.out.println(weatherController.getLocationForecast(selectedId, selectedDate));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            System.out.println("JSON NOOOO");
         }
     }
 }
