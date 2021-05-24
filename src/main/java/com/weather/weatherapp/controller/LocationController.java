@@ -52,4 +52,40 @@ public class LocationController {
             return mapper.writeValueAsString(new Error(e.getMessage()));
         }
     }
+
+    public String updateLocationCityName(long id, String cityName) throws JsonProcessingException {
+        try {
+            final Location updatedLocation = service.updateLocationCityName(id, cityName);
+            return mapper.writeValueAsString(updatedLocation);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
+
+    public String updateLocationCoords(long id, double lat, double lon) throws JsonProcessingException {
+        try {
+            final Location updatedLocation = service.updateLocationCoords(id, lat, lon);
+            return mapper.writeValueAsString(updatedLocation);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
+
+    public String updateLocationRegion(long selectedId, String region) throws JsonProcessingException {
+        try {
+            final Location updatedLocation = service.updateLocationRegion(selectedId, region);
+            return mapper.writeValueAsString(updatedLocation);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
+
+    public String updateLocationCountry(long id, String country) throws JsonProcessingException {
+        try {
+            final Location updatedLocation = service.updateLocationCountry(id, country);
+            return mapper.writeValueAsString(updatedLocation);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
 }

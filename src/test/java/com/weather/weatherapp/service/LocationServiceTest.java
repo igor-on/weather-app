@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -191,5 +192,265 @@ class LocationServiceTest {
         assertThat(actual).contains(LOCATION);
         assertThat(actual).hasSize(1);
         assertThat(actual).hasOnlyElementsOfType(Location.class);
+    }
+
+    @Test
+    void thatUpdateLocationCityNameWorksCorrectly() throws NoLocationFoundException, InvalidDataException {
+        String testCityName = "Majami";
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+        LOCATION.setCityName(testCityName);
+        when(locationRepository.update(any())).thenReturn(LOCATION);
+
+        final Location actual = service.updateLocationCityName(IDENTIFIER, testCityName);
+
+        assertThat(actual.getCityName())
+                .isEqualTo(testCityName);
+        assertThat(actual.getCityName())
+                .isNotEqualTo(CITY_NAME);
+
+        assertThat(actual.getId())
+                .isNotNull()
+                .isEqualTo(IDENTIFIER);
+
+        assertThat(actual.getLatitude())
+                .isEqualTo(LATITUDE);
+
+        assertThat(actual.getLongitude())
+                .isEqualTo(LONGITUDE);
+
+        assertThat(actual.getRegion())
+                .isEqualTo(REGION);
+
+        assertThat(actual.getCountry())
+                .isEqualTo(COUNTRY);
+
+        verify(locationRepository, times(1)).find(anyLong());
+        verify(locationRepository, times(1)).update(any());
+    }
+
+    @Test
+    void thatUpdateCityNameThrowsNoLocationFoundException() throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenThrow(NoLocationFoundException.class);
+
+        //na obiekcie który nie jest Mockiem wystarczy uzupelnic tylko jeden(lub większość np 2 an 3 (?)) argument czyms konkretnym?
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.updateLocationCityName(IDENTIFIER, anyString()));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"  ", ""})
+    void thatUpdateCityNameThrowsInvalidDataException(String value) throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class,
+                () -> service.updateLocationCityName(anyLong(), value));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("City name can't be empty");
+    }
+
+    @Test
+    void thatUpdateCityNameThrowsInvalidDataExceptionOnNull() throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class,
+                () -> service.updateLocationCityName(anyLong(), null));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("City name can't be empty");
+    }
+
+    @Test
+    void thatUpdateLocationCoordsWorksCorrectly() throws NoLocationFoundException, InvalidDataException {
+        //given
+        double testLat = 12.345;
+        double testLon = 89.678;
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+        LOCATION.setLatitude(testLat);
+        LOCATION.setLongitude(testLon);
+        when(locationRepository.update(any())).thenReturn(LOCATION);
+
+        //when
+        final Location actual = service.updateLocationCoords(IDENTIFIER, testLat, testLon);
+
+        //then
+        assertThat(actual.getCityName())
+                .isEqualTo(CITY_NAME);
+
+        assertThat(actual.getId())
+                .isNotNull()
+                .isEqualTo(IDENTIFIER);
+
+        assertThat(actual.getLatitude())
+                .isEqualTo(testLat);
+
+        assertThat(actual.getLongitude())
+                .isEqualTo(testLon);
+
+        assertThat(actual.getLatitude())
+                .isNotEqualTo(LATITUDE);
+
+        assertThat(actual.getLongitude())
+                .isNotEqualTo(LONGITUDE);
+
+        assertThat(actual.getRegion())
+                .isEqualTo(REGION);
+
+        assertThat(actual.getCountry())
+                .isEqualTo(COUNTRY);
+
+        verify(locationRepository, times(1)).find(anyLong());
+        verify(locationRepository, times(1)).update(any());
+    }
+
+    @Test
+    void thatUpdateCoordsThrowsNoLocationFoundException() throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenThrow(NoLocationFoundException.class);
+
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.updateLocationCoords(IDENTIFIER, LATITUDE, anyDouble()));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"91, 155", "56.9811, -183.091", "-94.234, 120.32", "-91, -184", "91, 184"})
+    void thatUpdateCoordsThrowsInvalidDataException(double lat, double lon) throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () ->
+                service.updateLocationCoords(anyLong(), lat, lon));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class)
+                .hasMessage("Given geographical coordinates are incorrect");
+    }
+
+    @Test
+    void thatUpdateLocationRegionWorksCorrectly() throws NoLocationFoundException, InvalidDataException {
+        //given
+        String testRegion = "Zasiedmiogórogród";
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+        LOCATION.setRegion(testRegion);
+        when(locationRepository.update(any())).thenReturn(LOCATION);
+
+        //when
+        final Location actual = service.updateLocationRegion(IDENTIFIER, testRegion);
+
+        //then
+        assertThat(actual.getRegion()).isEqualTo(testRegion);
+        assertThat(actual.getRegion()).isNotEqualTo(REGION);
+
+        assertThat(actual.getCityName())
+                .isEqualTo(CITY_NAME);
+
+        assertThat(actual.getId())
+                .isNotNull()
+                .isEqualTo(IDENTIFIER);
+
+        assertThat(actual.getLatitude())
+                .isEqualTo(LATITUDE);
+
+        assertThat(actual.getLongitude())
+                .isEqualTo(LONGITUDE);
+
+        assertThat(actual.getCountry())
+                .isEqualTo(COUNTRY);
+
+        verify(locationRepository, times(1)).find(anyLong());
+        verify(locationRepository, times(1)).update(any());
+    }
+
+    @Test
+    void thatUpdateRegionThrowsNoLocationFoundException() throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenThrow(NoLocationFoundException.class);
+
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.updateLocationRegion(IDENTIFIER, anyString()));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"  ", ""})
+    void thatUpdateRegionThrowsInvalidDataException(String value) throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class,
+                () -> service.updateLocationRegion(anyLong(), value));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given region is incorrect");
+    }
+
+    @Test
+    void thatUpdateRegionThrowsInvalidDataExceptionOnNull() throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class,
+                () -> service.updateLocationRegion(anyLong(), null));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given region is incorrect");
+    }
+
+    @Test
+    void thatUpdateLocationCountryWorksCorrectly() throws NoLocationFoundException, InvalidDataException {
+        //given
+        String testCountry = "UNITED STATES";
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+        LOCATION.setCountry(testCountry);
+        when(locationRepository.update(any())).thenReturn(LOCATION);
+
+        //when
+        final Location actual = service.updateLocationCountry(IDENTIFIER, testCountry);
+
+        //then
+        assertThat(actual.getCountry()).isEqualTo(testCountry);
+        assertThat(actual.getCountry()).isNotEqualTo(COUNTRY);
+
+
+        assertThat(actual.getCityName())
+                .isEqualTo(CITY_NAME);
+
+        assertThat(actual.getId())
+                .isNotNull()
+                .isEqualTo(IDENTIFIER);
+
+        assertThat(actual.getLatitude())
+                .isEqualTo(LATITUDE);
+
+        assertThat(actual.getLongitude())
+                .isEqualTo(LONGITUDE);
+
+        assertThat(actual.getRegion())
+                .isEqualTo(REGION);
+
+        verify(locationRepository, times(1)).find(anyLong());
+        verify(locationRepository, times(1)).update(any());
+    }
+
+    @Test
+    void thatUpdateCountryThrowsNoLocationFoundException() throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenThrow(NoLocationFoundException.class);
+
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.updateLocationCountry(IDENTIFIER, anyString()));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"  ", ""})
+    void thatUpdateCountryThrowsInvalidDataException(String value) throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class,
+                () -> service.updateLocationCountry(anyLong(), value));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given country is incorrect");
+    }
+
+    @Test
+    void thatUpdateCountryThrowsInvalidDataExceptionOnNull() throws NoLocationFoundException {
+        when(service.findLocationById(anyLong())).thenReturn(LOCATION);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class,
+                () -> service.updateLocationCountry(anyLong(), null));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given country is incorrect");
     }
 }

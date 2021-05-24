@@ -24,6 +24,7 @@ public class UserInterface {
             System.out.println("4. Show all saved localizations");
             System.out.println("5. Save current weather for available localizations");
             System.out.println("6. Show all saved weathers");
+            System.out.println("7. Update localization");
             System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
@@ -45,6 +46,9 @@ public class UserInterface {
                     break;
                 case 6:
                     showAllSavedWeathers();
+                    break;
+                case 7:
+                    updateLocation();
                     break;
                 case 0:
                     return;
@@ -138,6 +142,53 @@ public class UserInterface {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             System.out.println("JSON HOW DARE YOU");
+        }
+    }
+
+    private void updateLocation() {
+        System.out.println("What are you want to update?");
+        System.out.println("1. City name");
+        System.out.println("2. Geographical Coordination");
+        System.out.println("3. Region");
+        System.out.println("4. Country");
+        int userChoice = scanner.nextInt();
+        showAllSavedLocations();
+        System.out.println("Choose location to update by its id");
+        long selectedId = scanner.nextLong();
+        try {
+            switch (userChoice) {
+                case 1:
+                    System.out.println("Write new city name for your location");
+                    scanner.nextLine();
+                    String cityName = scanner.nextLine();
+                    System.out.println(locationController.updateLocationCityName(selectedId, cityName));
+                    break;
+                case 2:
+                    System.out.println("Write new coordination for your location");
+                    System.out.println("Write latitude");
+                    double latitude = scanner.nextDouble();
+                    System.out.println("Write longitude");
+                    double longitude = scanner.nextDouble();
+                    System.out.println(locationController.updateLocationCoords(selectedId, latitude, longitude));
+                    break;
+
+                case 3:
+                    System.out.println("Write new region for your location");
+                    scanner.nextLine();
+                    final String region = scanner.nextLine();
+                    System.out.println(locationController.updateLocationRegion(selectedId, region));
+                    break;
+                case 4:
+                    System.out.println("Write new country for your location");
+                    scanner.nextLine();
+                    final String country = scanner.nextLine();
+                    System.out.println(locationController.updateLocationCountry(selectedId, country));
+                    break;
+                default:
+                    System.out.println("There's no options like this!");
+            }
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
         }
     }
 }

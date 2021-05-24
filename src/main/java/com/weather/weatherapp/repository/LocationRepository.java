@@ -74,4 +74,16 @@ public class LocationRepository {
 
         return allLocations;
     }
+
+    public Location update(Location location) {
+        final Session session = sessionFactory.openSession();
+        final Transaction transaction = session.beginTransaction();
+
+        session.update(location);
+
+        transaction.commit();
+        session.close();
+
+        return location;
+    }
 }

@@ -68,4 +68,53 @@ public class LocationService {
     public List<Location> getAllLocations() {
         return locationRepository.findAll();
     }
+
+    public Location updateLocationCityName(long id, String cityName) throws NoLocationFoundException, InvalidDataException {
+        final Location foundLocation = findLocationById(id);
+
+        if (stringValueIsNotValid(cityName)) {
+            throw new InvalidDataException("City name can't be empty");
+        }
+
+        foundLocation.setCityName(cityName);
+
+        return locationRepository.update(foundLocation);
+    }
+
+    public Location updateLocationCoords(long id, double lat, double lon) throws NoLocationFoundException, InvalidDataException {
+        final Location foundLocation = findLocationById(id);
+
+        if (coordinatesNotValid(lat, lon)) {
+            throw new InvalidDataException("Given geographical coordinates are incorrect");
+        }
+
+        foundLocation.setLatitude(lat);
+        foundLocation.setLongitude(lon);
+
+        return locationRepository.update(foundLocation);
+    }
+
+    public Location updateLocationRegion(long id, String region) throws NoLocationFoundException, InvalidDataException {
+        final Location foundLocation = findLocationById(id);
+
+        if (stringValueIsNotValid(region)) {
+            throw new InvalidDataException("Given region is incorrect");
+        }
+
+        foundLocation.setRegion(region);
+
+        return locationRepository.update(foundLocation);
+    }
+
+    public Location updateLocationCountry(long id, String country) throws NoLocationFoundException, InvalidDataException {
+        final Location foundLocation = findLocationById(id);
+
+        if (stringValueIsNotValid(country)) {
+            throw new InvalidDataException("Given country is incorrect");
+        }
+
+        foundLocation.setCountry(country);
+
+        return locationRepository.update(foundLocation);
+    }
 }

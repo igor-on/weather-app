@@ -117,11 +117,11 @@ class LocationControllerTest {
 
     @Test
     void thatFindLocationByCityNameThrowsNoLocationFoundException() throws JsonProcessingException, NoLocationFoundException, InvalidDataException {
-        when(locationService.findLocation(CITY_NAME)).thenThrow(new NoLocationFoundException("There is no location with given id: " + IDENTIFIER));
+        when(locationService.findLocation(CITY_NAME)).thenThrow(new NoLocationFoundException("There is no location with given city name: " + CITY_NAME));
 
         final String actualJson = controller.findLocationByCityName(CITY_NAME);
 
-        assertThat(actualJson).contains("\"message\" : \"There is no location with given id: 2\"");
+        assertThat(actualJson).contains("\"message\" : \"There is no location with given city name: Miami\"");
     }
 
     @Test
@@ -140,5 +140,136 @@ class LocationControllerTest {
         assertThat(actualJson).contains("\"region\" : null,");
         assertThat(actualJson).contains("\"latitude\" : 25.7743,");
         assertThat(actualJson).contains("\"country\" : \"US\"");
+    }
+
+    @Test
+    void thatUpdateLocationCityNameWorksCorrectly() throws JsonProcessingException, NoLocationFoundException, InvalidDataException {
+        LOCATION.setCityName("Majami");
+        when(locationService.updateLocationCityName(IDENTIFIER, "Majami")).thenReturn(LOCATION);
+
+        final String actualJson = controller.updateLocationCityName(IDENTIFIER, "Majami");
+
+        assertThat(actualJson).contains("\"cityName\" : \"Majami\",");
+        assertThat(actualJson).contains("\"region\" : null,");
+        assertThat(actualJson).contains("\"latitude\" : 25.7743,");
+        assertThat(actualJson).contains("\"country\" : \"US\"");
+    }
+
+    @Test
+    void thatUpdateLocationCityNameThrowsNoLocationFoundException() throws InvalidDataException, NoLocationFoundException, JsonProcessingException {
+        when(locationService.updateLocationCityName(IDENTIFIER, CITY_NAME)).thenThrow(new NoLocationFoundException("There is no saved location with given id: " + IDENTIFIER));
+
+        final String actualJson = controller.updateLocationCityName(IDENTIFIER, CITY_NAME);
+
+        assertThat(actualJson).contains("\"message\" : \"There is no saved location with given id: 2\"");
+    }
+
+    @Test
+    void thatUpdateLocationCityNameThrowsInvalidDataException() throws JsonProcessingException, InvalidDataException, NoLocationFoundException {
+        when(locationService.updateLocationCityName(IDENTIFIER, CITY_NAME)).thenThrow(new InvalidDataException("City name can't be empty"));
+
+        final String actualJson = controller.updateLocationCityName(IDENTIFIER, CITY_NAME);
+
+        assertThat(actualJson).contains("\"message\" : \"City name can't be empty\"");
+    }
+
+    @Test
+    void thatUpdateLocationCoordsWorksCorrectly() throws JsonProcessingException, NoLocationFoundException, InvalidDataException {
+        final double newLatitude = 85.123;
+        final double newLongitude = 123.08;
+        LOCATION.setLatitude(newLatitude);
+        LOCATION.setLongitude(newLongitude);
+        when(locationService.updateLocationCoords(IDENTIFIER, newLatitude, newLongitude)).thenReturn(LOCATION);
+
+        final String actualJson = controller.updateLocationCoords(IDENTIFIER, newLatitude, newLongitude);
+
+        assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
+        assertThat(actualJson).contains("\"region\" : null,");
+        assertThat(actualJson).contains("\"latitude\" : 85.123,");
+        assertThat(actualJson).contains("\"longitude\" : 123.08,");
+        assertThat(actualJson).contains("\"country\" : \"US\"");
+    }
+
+    @Test
+    void thatUpdateLocationCoordsThrowsNoLocationFoundException() throws InvalidDataException, NoLocationFoundException, JsonProcessingException {
+        when(locationService.updateLocationCoords(IDENTIFIER, LATITUDE, LONGITUDE)).thenThrow(new NoLocationFoundException("There is no saved location with given id: " + IDENTIFIER));
+
+        final String actualJson = controller.updateLocationCoords(IDENTIFIER, LATITUDE, LONGITUDE);
+
+        assertThat(actualJson).contains("\"message\" : \"There is no saved location with given id: 2\"");
+    }
+
+    @Test
+    void thatUpdateLocationCoordsThrowsInvalidDataException() throws JsonProcessingException, InvalidDataException, NoLocationFoundException {
+        when(locationService.updateLocationCoords(IDENTIFIER, LATITUDE, LONGITUDE)).thenThrow(new InvalidDataException("Given geographical coordinates are incorrect"));
+
+        final String actualJson = controller.updateLocationCoords(IDENTIFIER, LATITUDE, LONGITUDE);
+
+
+        assertThat(actualJson).contains("\"message\" : \"Given geographical coordinates are incorrect\"");
+    }
+
+    @Test
+    void thatUpdateLocationRegionWorksCorrectly() throws JsonProcessingException, NoLocationFoundException, InvalidDataException {
+        final String newRegion = "Atlantyda";
+        LOCATION.setRegion(newRegion);
+        when(locationService.updateLocationRegion(IDENTIFIER, newRegion)).thenReturn(LOCATION);
+
+        final String actualJson = controller.updateLocationRegion(IDENTIFIER, newRegion);
+
+        assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
+        assertThat(actualJson).contains("\"region\" : \"Atlantyda\",");
+        assertThat(actualJson).contains("\"latitude\" : 25.7743,");
+        assertThat(actualJson).contains("\"country\" : \"US\"");
+    }
+
+    @Test
+    void thatUpdateLocationRegionThrowsNoLocationFoundException() throws InvalidDataException, NoLocationFoundException, JsonProcessingException {
+        when(locationService.updateLocationRegion(IDENTIFIER, REGION)).thenThrow(new NoLocationFoundException("There is no saved location with given id: " + IDENTIFIER));
+
+        final String actualJson = controller.updateLocationRegion(IDENTIFIER, REGION);
+
+        assertThat(actualJson).contains("\"message\" : \"There is no saved location with given id: 2\"");
+    }
+
+    @Test
+    void thatUpdateLocationRegionThrowsInvalidDataException() throws JsonProcessingException, InvalidDataException, NoLocationFoundException {
+        when(locationService.updateLocationRegion(IDENTIFIER,REGION)).thenThrow(new InvalidDataException("Given region is incorrect"));
+
+        final String actualJson = controller.updateLocationRegion(IDENTIFIER, REGION);
+
+        assertThat(actualJson).contains("\"message\" : \"Given region is incorrect\"");
+    }
+
+    @Test
+    void thatUpdateLocationCountryWorksCorrectly() throws JsonProcessingException, NoLocationFoundException, InvalidDataException {
+        final String newCountry = "Dominikana";
+        LOCATION.setCountry(newCountry);
+        when(locationService.updateLocationCountry(IDENTIFIER, newCountry)).thenReturn(LOCATION);
+
+        final String actualJson = controller.updateLocationCityName(IDENTIFIER, newCountry);
+
+        assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
+        assertThat(actualJson).contains("\"region\" : null,");
+        assertThat(actualJson).contains("\"latitude\" : 25.7743,");
+        assertThat(actualJson).contains("\"country\" : \"Dominikana\"");
+    }
+
+    @Test
+    void thatUpdateLocationCountryThrowsNoLocationFoundException() throws InvalidDataException, NoLocationFoundException, JsonProcessingException {
+        when(locationService.updateLocationCountry(IDENTIFIER, COUNTRY)).thenThrow(new NoLocationFoundException("There is no saved location with given id: " + IDENTIFIER));
+
+        final String actualJson = controller.updateLocationCountry(IDENTIFIER, COUNTRY);
+
+        assertThat(actualJson).contains("\"message\" : \"There is no saved location with given id: 2\"");
+    }
+
+    @Test
+    void thatUpdateLocationCountryThrowsInvalidDataException() throws JsonProcessingException, InvalidDataException, NoLocationFoundException {
+        when(locationService.updateLocationCountry(IDENTIFIER,COUNTRY)).thenThrow(new InvalidDataException("Given country is incorrect"));
+
+        final String actualJson = controller.updateLocationCountry(IDENTIFIER, COUNTRY);
+
+        assertThat(actualJson).contains("\"message\" : \"Given country is incorrect\"");
     }
 }
