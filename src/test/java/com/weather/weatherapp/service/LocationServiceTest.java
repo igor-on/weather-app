@@ -14,6 +14,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -175,5 +178,18 @@ class LocationServiceTest {
         Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.findLocation(CITY_NAME));
 
         assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
+    }
+
+    @Test
+    void thatGetAllLocationsWorksCorrectly() {
+        List<Location> ALLLOCATIONS = new ArrayList<>();
+        ALLLOCATIONS.add(LOCATION);
+        when(locationRepository.findAll()).thenReturn(ALLLOCATIONS);
+
+        final List<Location> actual = service.getAllLocations();
+
+        assertThat(actual).contains(LOCATION);
+        assertThat(actual).hasSize(1);
+        assertThat(actual).hasOnlyElementsOfType(Location.class);
     }
 }
