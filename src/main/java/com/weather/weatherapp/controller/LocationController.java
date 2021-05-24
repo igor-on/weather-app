@@ -23,4 +23,13 @@ public class LocationController {
             return mapper.writeValueAsString(new Error(e.getMessage()));
         }
     }
+
+    public String removeLocation(long id) throws JsonProcessingException {
+        try {
+            service.removeLocation(id);
+            return "Location deleted correctly";
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
 }

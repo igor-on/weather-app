@@ -2,6 +2,7 @@ package com.weather.weatherapp.service;
 
 import com.weather.weatherapp.dto.Location;
 import com.weather.weatherapp.exception.InvalidDataException;
+import com.weather.weatherapp.exception.NoLocationFoundException;
 import com.weather.weatherapp.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -44,5 +45,14 @@ public class LocationService {
 
     boolean coordinatesNotValid(double lat, double lon) {
         return (lat < -90 || lat > 90) || (lon < -180 || lon > 180);
+    }
+
+    public void removeLocation(long id) throws NoLocationFoundException {
+        Location foundLocation = findLocationById(id);
+        locationRepository.remove(foundLocation);
+    }
+
+    public Location findLocationById(long id) throws NoLocationFoundException {
+        return locationRepository.find(id);
     }
 }
