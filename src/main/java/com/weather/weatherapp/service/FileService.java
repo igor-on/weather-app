@@ -55,6 +55,32 @@ public class FileService {
         return "Successfully wrote to file " + file.getName();
     }
 
+    public String getLocationsFromFile(String fileName) throws IOException, InvalidDataException {
+        final File file = getJsonFile(fileName);
+
+        final Location[] locations = mapper.readValue(file, Location[].class);
+        final List<Location> locationList = List.of(locations);
+
+        locationService.saveLocationListInDB(locationList);
+
+        return getSuccessfulReadMessage(file);
+    }
+
+    public String getLocationsWeathersFromFile(String fileName) throws IOException, InvalidDataException {
+        final File file = getJsonFile(fileName);
+
+        final Weather[] locationsWeathers = mapper.readValue(file, Weather[].class);
+        final List<Weather> locationWeatherList = List.of(locationsWeathers);
+
+        weatherService.saveWeatherListInDB(locationWeatherList);
+
+        return getSuccessfulReadMessage(file);
+    }
+
+    private String getSuccessfulReadMessage(File file) {
+        return "Successfully read from file " + file.getName() + " and saved in data base";
+    }
+
     private File getJsonFile(String fileName) throws InvalidDataException {
         if(fileName == null || fileName.isBlank() || fileName.length() > 40){
             throw new InvalidDataException("Given file name is incorrect");

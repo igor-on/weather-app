@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.weather.weatherapp.service.FileService;
+import com.weather.weatherapp.exception.Error;
 import lombok.RequiredArgsConstructor;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
 public class FileController {
@@ -24,6 +27,26 @@ public class FileController {
     public String writeLocationsWeathersToFile(String fileName) throws JsonProcessingException {
         try {
             return fileService.writeLocationsWeathersToFile(fileName);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
+
+    public String getLocationsDataFromFile(String fileName) throws JsonProcessingException {
+        try {
+            return fileService.getLocationsFromFile(fileName);
+        } catch (IOException e) {
+            return mapper.writeValueAsString(new Error("Given objects from file can't be deserialized, wrong DTO"));
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
+
+    public String getLocationsWeathersDataFromFile(String fileName) throws JsonProcessingException {
+        try {
+            return fileService.getLocationsWeathersFromFile(fileName);
+        } catch (IOException e) {
+            return mapper.writeValueAsString(new Error("Given objects from file can't be deserialized, wrong DTO"));
         } catch (Exception e) {
             return mapper.writeValueAsString(new Error(e.getMessage()));
         }

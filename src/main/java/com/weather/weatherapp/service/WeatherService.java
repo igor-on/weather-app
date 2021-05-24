@@ -118,4 +118,8 @@ public class WeatherService {
 
         return list.get(0);
     }
+
+    public void saveWeatherListInDB(List<Weather> list) {
+        list.forEach(weatherRepository::save);
+    }
 }

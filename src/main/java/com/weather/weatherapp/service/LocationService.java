@@ -117,4 +117,8 @@ public class LocationService {
 
         return locationRepository.update(foundLocation);
     }
+
+    public void saveLocationListInDB(List<Location> list) {
+        list.forEach(locationRepository::save);
+    }
 }
