@@ -1,6 +1,7 @@
 package com.weather.weatherapp.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.weather.weatherapp.dto.Location;
 import com.weather.weatherapp.exception.InvalidDataException;
 import com.weather.weatherapp.exception.NoLocationFoundException;
@@ -12,12 +13,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LocationControllerTest {
 
+    ObjectMapper mapper = new ObjectMapper();
     private static final Long IDENTIFIER = 2L;
     public static final String CITY_NAME = "Miami";
     public static final Double LATITUDE = 25.7743;
@@ -116,5 +122,23 @@ class LocationControllerTest {
         final String actualJson = controller.findLocationByCityName(CITY_NAME);
 
         assertThat(actualJson).contains("\"message\" : \"There is no location with given id: 2\"");
+    }
+
+    @Test
+    void thatShowAllSavedLocationsWorksCorrectly() throws IOException {
+        List<Location> locationList = new ArrayList<>();
+        locationList.add(LOCATION);
+        locationList.add(LOCATION);
+        when(locationService.getAllLocations()).thenReturn(locationList);
+
+        final String actualJson = controller.showAllSavedLocations();
+        final List<Location> list = List.of(mapper.readValue(actualJson, Location[].class));
+
+        assertThat(list).hasSize(2);
+        assertThat(actualJson).contains("\"id\" : 2,");
+        assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
+        assertThat(actualJson).contains("\"region\" : null,");
+        assertThat(actualJson).contains("\"latitude\" : 25.7743,");
+        assertThat(actualJson).contains("\"country\" : \"US\"");
     }
 }

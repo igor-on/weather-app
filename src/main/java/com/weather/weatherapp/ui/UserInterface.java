@@ -18,6 +18,7 @@ public class UserInterface {
             System.out.println("1. Add new localization");
             System.out.println("2. Remove localization");
             System.out.println("3. Find localization data by city name");
+            System.out.println("4. Show all saved localizations");
             System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
@@ -30,6 +31,9 @@ public class UserInterface {
                     break;
                 case 3:
                     findLocationByCityName();
+                    break;
+                case 4:
+                    showAllSavedLocations();
                     break;
                 case 0:
                     return;
@@ -61,6 +65,7 @@ public class UserInterface {
     }
 
     private void removeLocation() {
+        showAllSavedLocations();
         System.out.println("Choose location to remove by it's id");
         long selectedId = scanner.nextLong();
         try {
@@ -78,6 +83,14 @@ public class UserInterface {
             System.out.println(locationController.findLocationByCityName(selectedCity));
         } catch (JsonProcessingException e) {
             System.out.println("JSON CO JEST");
+        }
+    }
+
+    private void showAllSavedLocations() {
+        try {
+            System.out.println(locationController.showAllSavedLocations());
+        } catch (JsonProcessingException e) {
+            System.out.println("Json o co ci chodzi");
         }
     }
 }

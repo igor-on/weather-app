@@ -8,6 +8,8 @@ import com.weather.weatherapp.service.LocationService;
 import com.weather.weatherapp.exception.Error;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class LocationController {
 
@@ -37,6 +39,15 @@ public class LocationController {
         try {
             Location location = service.findLocation(cityName);
             return mapper.writeValueAsString(location);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
+
+    public String showAllSavedLocations() throws JsonProcessingException {
+        try {
+            List<Location> allLocations = service.getAllLocations();
+            return mapper.writeValueAsString(allLocations);
         } catch (Exception e) {
             return mapper.writeValueAsString(new Error(e.getMessage()));
         }

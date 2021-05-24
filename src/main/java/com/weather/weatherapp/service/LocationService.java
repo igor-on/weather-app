@@ -6,6 +6,8 @@ import com.weather.weatherapp.exception.NoLocationFoundException;
 import com.weather.weatherapp.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class LocationService {
 
@@ -61,5 +63,9 @@ public class LocationService {
             throw new InvalidDataException("Given city name is not correct");
         }
         return locationRepository.findByName(cityName);
+    }
+
+    public List<Location> getAllLocations() {
+        return locationRepository.findAll();
     }
 }
