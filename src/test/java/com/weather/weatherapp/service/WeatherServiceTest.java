@@ -2,6 +2,7 @@ package com.weather.weatherapp.service;
 
 import com.weather.weatherapp.client.WeatherClient;
 import com.weather.weatherapp.dto.Location;
+import com.weather.weatherapp.dto.StatisticalWeatherDTO;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.forecast.Forecast;
 import com.weather.weatherapp.exception.InvalidDataException;
@@ -209,4 +210,67 @@ class WeatherServiceTest {
 
         assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Wrong data provided");
     }
+
+    @Test
+    void thatGetStatisticalDataWorksCorrectly() throws InvalidDataException, NoLocationFoundException {
+        double TEMPERATURE = 27.4;
+        double HUMIDITY = 54D;
+        double PRESSURE = 1019D;
+        double WIND_SPEED = 6.17;
+        double WIND_DEGREE = 101D;
+        Object[] locationFields = new Object[6];
+        locationFields[0] = CITY_NAME;
+        locationFields[1] = TEMPERATURE;
+        locationFields[2] = HUMIDITY;
+        locationFields[3] = PRESSURE;
+        locationFields[4] = WIND_SPEED;
+        locationFields[5] = WIND_DEGREE;
+        List<Object[]> rows = new ArrayList<>();
+        rows.add(locationFields);
+        when(weatherRepository.findStatisticalWeatherDataFromLastMonthByCityName(CITY_NAME)).thenReturn(rows);
+
+        final StatisticalWeatherDTO actual = service.getStatisticalData(CITY_NAME);
+
+        assertThat(actual.getCityName()).isEqualTo(CITY_NAME);
+        assertThat(actual.getTemperature()).isEqualTo(27.4);
+        assertThat(actual.getPressure()).isEqualTo(1019D);
+        assertThat(actual.getHumidity()).isEqualTo(54D);
+        assertThat(actual.getWindSpeed()).isEqualTo(6.17);
+        assertThat(actual.getWindDegree()).isEqualTo(101.0);
+    }
+
+    @Test
+    void thatGetStatisticalDataThrowsIllegalArgumentException(){
+        double TEMPERATURE = 27.4;
+        double HUMIDITY = 54D;
+        double PRESSURE = 1019D;
+        double WIND_SPEED = 6.17;
+        double WIND_DEGREE = 101D;
+        Object[] locationFields = new Object[6];
+        locationFields[0] = CITY_NAME;
+        locationFields[1] = TEMPERATURE;
+        locationFields[2] = HUMIDITY;
+        locationFields[3] = PRESSURE;
+        locationFields[4] = WIND_SPEED;
+        locationFields[5] = WIND_DEGREE;
+        List<Object[]> rows = new ArrayList<>();
+        rows.add(locationFields);
+        rows.add(locationFields);
+        when(weatherRepository.findStatisticalWeatherDataFromLastMonthByCityName(anyString())).thenReturn(rows);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.getStatisticalData(anyString()));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("There can't be more than one result");
+    }
+
+    @Test
+    void thatGetStatisticalDataThrowsNoLocationFoundException(){
+        List<Object[]> rows = new ArrayList<>();
+        when(weatherRepository.findStatisticalWeatherDataFromLastMonthByCityName(anyString())).thenReturn(rows);
+
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.getStatisticalData(CITY_NAME));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class).hasMessage("There is no location with given city name: Miami");
+    }
+
 }
