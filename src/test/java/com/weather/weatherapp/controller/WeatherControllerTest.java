@@ -1,6 +1,7 @@
 package com.weather.weatherapp.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.weather.weatherapp.dto.StatisticalWeatherDTO;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.forecast.Forecast;
 import com.weather.weatherapp.exception.InvalidDataException;
@@ -55,6 +56,14 @@ class WeatherControllerTest {
     private static final Forecast LOCATION_FORECAST = Forecast.builder()
             .cityName(CITY_NAME)
             .timezone("America/New_York")
+            .build();
+    private static final StatisticalWeatherDTO LOCATION_STATISTICAL_DATA_DTO = StatisticalWeatherDTO.builder()
+            .cityName(CITY_NAME)
+            .temperature(TEMPERATURE)
+            .pressure(PRESSURE)
+            .humidity(HUMIDITY)
+            .windSpeed(WIND_SPEED)
+            .windDegree(WIND_DEGREE)
             .build();
 
     @Mock
@@ -141,7 +150,8 @@ class WeatherControllerTest {
 
         final String actualJson = controller.showAllSavedWeathers();
 
-        // LocationWeatherDTO - Json
+        // WeatherDTO - Json
+        assertThat(actualJson).contains("\"id\" : 1,");
         assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
         assertThat(actualJson).contains("\"temperature\" : \"27.4\",");
         assertThat(actualJson).contains("\"pressure\" : \"1019.0\",");
@@ -197,5 +207,39 @@ class WeatherControllerTest {
         final String actualJson = controller.getLocationForecast(IDENTIFIER, NOW.toString());
 
         assertThat(actualJson).contains("\"message\" : ");
+    }
+
+    @Test
+    void getLocationWeatherStatisticalData() throws InvalidDataException, JsonProcessingException, NoLocationFoundException {
+        when(weatherService.getStatisticalData(CITY_NAME)).thenReturn(LOCATION_STATISTICAL_DATA_DTO);
+
+        final String actualJson = controller.getLocationWeatherStatisticalData(CITY_NAME);
+
+        //StatisticalWeatherDTO - Json
+        assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
+        assertThat(actualJson).contains("\"temperature\" : 27.4,");
+        assertThat(actualJson).contains("\"pressure\" : 1019.0,");
+        assertThat(actualJson).contains("\"humidity\" : 54.0,");
+        assertThat(actualJson).contains("\"windSpeed\" : 6.17,");
+        assertThat(actualJson).contains("\"windDegree\" : 250.0");
+        assertThat(actualJson).doesNotContain("\"dateTime\" : ");
+    }
+
+    @Test
+    void thatGetLocationWeatherStatisticalDataThrowsInvalidDataException() throws JsonProcessingException, InvalidDataException, NoLocationFoundException {
+        when(weatherService.getStatisticalData(CITY_NAME)).thenThrow(new InvalidDataException("There can't be more than one result"));
+
+        final String actualJson = controller.getLocationWeatherStatisticalData(CITY_NAME);
+
+        assertThat(actualJson).contains("\"message\" : \"There can't be more than one result\"");
+    }
+
+    @Test
+    void thatGetLocationWeatherStatisticalDataThrowsNoLocationFoundException() throws JsonProcessingException, InvalidDataException, NoLocationFoundException {
+        when(weatherService.getStatisticalData(CITY_NAME)).thenThrow(new NoLocationFoundException("There is no saved location with given city name: " + CITY_NAME));
+
+        final String actualJson = controller.getLocationWeatherStatisticalData(CITY_NAME);
+
+        assertThat(actualJson).contains("\"message\" : \"There is no saved location with given city name: Miami\"");
     }
 }

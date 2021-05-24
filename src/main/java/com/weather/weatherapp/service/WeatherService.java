@@ -94,11 +94,6 @@ public class WeatherService {
     }
 
     public StatisticalWeatherDTO getStatisticalData(String cityName) throws InvalidDataException, NoLocationFoundException {
-
-        if(locationService.stringValueIsNotValid(cityName)){
-            throw new InvalidDataException("Given city name is incorrect");
-        }
-
         final List<Object[]> results = weatherRepository.findStatisticalWeatherDataFromLastMonthByCityName(cityName);
         List<StatisticalWeatherDTO> list = new ArrayList<>();
 
