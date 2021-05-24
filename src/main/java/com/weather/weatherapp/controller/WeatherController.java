@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.current.WeatherDTO;
+import com.weather.weatherapp.dto.forecast.Forecast;
+import com.weather.weatherapp.dto.forecast.ForecastDTO;
 import com.weather.weatherapp.mapper.WeatherDTOMapper;
 import com.weather.weatherapp.service.WeatherService;
 import com.weather.weatherapp.exception.Error;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.weather.weatherapp.mapper.ForecastDTOMapper.mapToForecastDTO;
 import static com.weather.weatherapp.mapper.WeatherDTOMapper.mapToWeatherDTO;
 
 @RequiredArgsConstructor
@@ -58,6 +61,18 @@ public class WeatherController {
             return mapper.writeValueAsString(mappedAll);
         } catch (JsonProcessingException e) {
             return mapper.writeValueAsString(new Error("Something went wrong :/"));
+        }
+    }
+
+    public String getLocationForecast(String cityName, String selectedDate) throws JsonProcessingException {
+        try {
+            final Forecast weatherForecast = weatherService.getWeatherForecast(cityName, selectedDate);
+
+            final ForecastDTO weatherForecastDTO = mapToForecastDTO(weatherForecast);
+
+            return mapper.writeValueAsString(weatherForecastDTO);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
         }
     }
 }

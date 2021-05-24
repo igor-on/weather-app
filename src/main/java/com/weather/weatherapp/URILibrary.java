@@ -46,4 +46,15 @@ public class URILibrary {
                 .addParameter("units", "m")
                 .build();
     }
+
+    public static URI getForecastForGeographicCoordinatesURI(double lat, double lon) throws URISyntaxException {
+        return new URIBuilder("http://api.openweathermap.org/data/2.5/onecall")
+                .addParameter("lat", String.valueOf(lat))
+                .addParameter("lon", String.valueOf(lon))
+                .addParameter("exclude", "minutely,hourly,alerts")
+                .addParameter("appid", FIRST_API_KEY)
+                .addParameter("units", "metric")
+                .addParameter("lang", "pl")
+                .build();
+    }
 }
