@@ -2,6 +2,7 @@ package com.weather.weatherapp.ui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.weather.weatherapp.controller.LocationController;
+import com.weather.weatherapp.controller.WeatherController;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Scanner;
@@ -9,7 +10,9 @@ import java.util.Scanner;
 @RequiredArgsConstructor
 public class UserInterface {
 
+
     private final LocationController locationController;
+    private final WeatherController weatherController;
     private final Scanner scanner = new Scanner(System.in);
 
     public void runApplication() {
@@ -19,6 +22,7 @@ public class UserInterface {
             System.out.println("2. Remove localization");
             System.out.println("3. Find localization data by city name");
             System.out.println("4. Show all saved localizations");
+            System.out.println("5. Save current weather for available localizations");
             System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
@@ -34,6 +38,9 @@ public class UserInterface {
                     break;
                 case 4:
                     showAllSavedLocations();
+                    break;
+                case 5:
+                    saveLocationCurrentWeather();
                     break;
                 case 0:
                     return;
@@ -91,6 +98,33 @@ public class UserInterface {
             System.out.println(locationController.showAllSavedLocations());
         } catch (JsonProcessingException e) {
             System.out.println("Json o co ci chodzi");
+        }
+    }
+
+    private void saveLocationCurrentWeather() {
+        showAllSavedLocations();
+        System.out.println("You want to add new location weather by its name(1) or geographical coords(2)?");
+        int userChoice = scanner.nextInt();
+        try {
+            switch (userChoice) {
+                case 1:
+                    System.out.println("Choose location by its city name");
+                    scanner.nextLine();
+                    String selectedCity = scanner.nextLine();
+                    System.out.println(weatherController.saveLocationWeatherByCityName(selectedCity));
+                    break;
+                case 2:
+                    //You don't want to choose your location by its coords
+                    System.out.println("Choose location by its geographical coordinates id");
+                    long selectedId = scanner.nextLong();
+                    System.out.println(weatherController.saveLocationWeatherByCoordinates(selectedId));
+                    break;
+                default:
+                    System.out.println("There's no option like this!");
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            System.out.println("JSON ERROR");
         }
     }
 }
