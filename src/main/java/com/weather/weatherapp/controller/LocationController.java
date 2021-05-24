@@ -32,4 +32,13 @@ public class LocationController {
             return mapper.writeValueAsString(new Error(e.getMessage()));
         }
     }
+
+    public String findLocationByCityName(String cityName) throws JsonProcessingException {
+        try {
+            Location location = service.findLocation(cityName);
+            return mapper.writeValueAsString(location);
+        } catch (Exception e) {
+            return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
 }

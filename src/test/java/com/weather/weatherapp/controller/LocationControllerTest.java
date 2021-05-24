@@ -86,4 +86,35 @@ class LocationControllerTest {
         assertThat(actualJson).contains("\"message\" : \"There is no location with given id: 2\"");
         verify(locationService, times(1)).removeLocation(IDENTIFIER);
     }
+
+    @Test
+    void thatFindLocationByCityNameWorksCorrectly() throws NoLocationFoundException, JsonProcessingException, InvalidDataException {
+        when(locationService.findLocation(CITY_NAME)).thenReturn(LOCATION);
+
+        final String actualJson = controller.findLocationByCityName(CITY_NAME);
+
+        assertThat(actualJson).contains("\"id\" : 2,");
+        assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
+        assertThat(actualJson).contains("\"region\" : null,");
+        assertThat(actualJson).contains("\"latitude\" : 25.7743,");
+        assertThat(actualJson).contains("\"country\" : \"US\"");
+    }
+
+    @Test
+    void thatFindLocationByCityNameThrowsInvalidDataException() throws JsonProcessingException, NoLocationFoundException, InvalidDataException {
+        when(locationService.findLocation(CITY_NAME)).thenThrow(new InvalidDataException("Given city name is not correct"));
+
+        final String actualJson = controller.findLocationByCityName(CITY_NAME);
+
+        assertThat(actualJson).contains("\"message\" : \"Given city name is not correct\"");
+    }
+
+    @Test
+    void thatFindLocationByCityNameThrowsNoLocationFoundException() throws JsonProcessingException, NoLocationFoundException, InvalidDataException {
+        when(locationService.findLocation(CITY_NAME)).thenThrow(new NoLocationFoundException("There is no location with given id: " + IDENTIFIER));
+
+        final String actualJson = controller.findLocationByCityName(CITY_NAME);
+
+        assertThat(actualJson).contains("\"message\" : \"There is no location with given id: 2\"");
+    }
 }

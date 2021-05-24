@@ -141,4 +141,39 @@ class LocationServiceTest {
 
         assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
     }
+
+    @Test
+    void thatFindLocationByCityNameWorksCorrectly() throws NoLocationFoundException, InvalidDataException {
+        when(locationRepository.findByName(CITY_NAME)).thenReturn(LOCATION);
+
+        final Location actual = service.findLocation(CITY_NAME);
+
+        assertThat(actual.getCityName()).isEqualTo("Miami");
+        verify(locationRepository, times(1)).findByName(CITY_NAME);
+    }
+
+    @Test
+    void thatFindLocationByCityNameThrowsInvalidDataExceptionOnNull() {
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.findLocation(null));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given city name is not correct");
+    }
+
+    @Test
+    void thatFindLocationByCityNameThrowsInvalidDataExceptionOnBlank() {
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.findLocation("   "));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given city name is not correct");
+    }
+
+    @Test
+    void thatFindLocationByCityNameThrowsNoLocationFoundException() throws NoLocationFoundException {
+        when(locationRepository.findByName(CITY_NAME)).thenThrow(NoLocationFoundException.class);
+
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.findLocation(CITY_NAME));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
+    }
 }

@@ -47,4 +47,18 @@ public class LocationRepository {
 
         return foundLocation.orElseThrow(() -> new NoLocationFoundException("There is no saved location with given id: " + id));
     }
+
+    public Location findByName(String cityName) throws NoLocationFoundException {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+
+        Optional<Location> foundLocation = session.createQuery("FROM Location WHERE cityName = :cityName", Location.class)
+                .setParameter("cityName", cityName)
+                .uniqueResultOptional();
+
+        transaction.commit();
+        session.close();
+
+        return foundLocation.orElseThrow(() -> new NoLocationFoundException("There is no saved location with given city name: " + cityName));
+    }
 }
