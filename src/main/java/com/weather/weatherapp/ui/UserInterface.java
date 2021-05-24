@@ -16,11 +16,16 @@ public class UserInterface {
         while (true) {
             System.out.println("Welcome in Weather APP, what do you want to do?");
             System.out.println("1. Add new localization");
+            System.out.println("2. Remove localization");
+            System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
             switch (userChoice) {
                 case 1:
                     addLocation();
+                    break;
+                case 2:
+                    removeLocation();
                     break;
                 case 0:
                     return;
@@ -48,6 +53,16 @@ public class UserInterface {
             System.out.println(locationController.addLocation(cityName, latitude, longitude, region, country));
         } catch (JsonProcessingException e) {
             System.out.println("JSON STOP PLEASE");
+        }
+    }
+
+    private void removeLocation() {
+        System.out.println("Choose location to remove by it's id");
+        long selectedId = scanner.nextLong();
+        try {
+            System.out.println(locationController.removeLocation(selectedId));
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
         }
     }
 }
