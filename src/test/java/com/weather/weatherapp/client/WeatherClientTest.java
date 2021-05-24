@@ -1,10 +1,12 @@
 package com.weather.weatherapp.client;
 
 import com.weather.weatherapp.dto.Weather;
+import com.weather.weatherapp.dto.forecast.Forecast;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -43,4 +45,20 @@ class WeatherClientTest {
         assertThat(actual.getDateTime()).isNotNull();
     }
 
+    @Test
+    void getForecastForGeographicCoordinates() throws InterruptedException, IOException, URISyntaxException {
+        final String stringDate = LocalDate.now().plusDays(1).toString();
+
+        final Forecast actual = client.getForecastForGeographicCoordinates(MIAMI_LAT, MIAMI_LON);
+
+        assertThat(actual.getCityName()).isNull();
+        assertThat(actual.getTimezone()).isNotNull().isEqualTo("America/New_York");
+        assertThat(actual.getForecastDaysList().size()).isEqualTo(8);
+        assertThat(actual.getForecastDaysList().get(1).getForecastDate()).isNotNull().isEqualTo(stringDate);
+        assertThat(actual.getForecastDaysList().get(1).getTemperature()).isNotNull();
+        assertThat(actual.getForecastDaysList().get(1).getHumidity()).isNotNull();
+        assertThat(actual.getForecastDaysList().get(1).getPressure()).isNotNull();
+        assertThat(actual.getForecastDaysList().get(1).getWindSpeed()).isNotNull();
+        assertThat(actual.getForecastDaysList().get(1).getWindDegree()).isNotNull();
+    }
 }

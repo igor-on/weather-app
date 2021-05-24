@@ -43,8 +43,8 @@ public class WeatherService {
         return weatherRepository.findAll();
     }
 
-    public Forecast getWeatherForecast(String cityName, String selectedDate) throws NoLocationFoundException, URISyntaxException, IOException, InterruptedException, InvalidDataException {
-        final Location foundLocation = locationService.findLocation(cityName);
+    public Forecast getWeatherForecast(Long id, String selectedDate) throws NoLocationFoundException, URISyntaxException, IOException, InterruptedException, InvalidDataException {
+        final Location foundLocation = locationService.findLocationById(id);
 
         final Forecast locationForecast
                 = weatherClient.getForecastForGeographicCoordinates(foundLocation.getLatitude(), foundLocation.getLongitude());

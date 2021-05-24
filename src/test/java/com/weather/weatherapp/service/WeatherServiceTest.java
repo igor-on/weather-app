@@ -3,6 +3,7 @@ package com.weather.weatherapp.service;
 import com.weather.weatherapp.client.WeatherClient;
 import com.weather.weatherapp.dto.Location;
 import com.weather.weatherapp.dto.Weather;
+import com.weather.weatherapp.dto.forecast.Forecast;
 import com.weather.weatherapp.exception.InvalidDataException;
 import com.weather.weatherapp.exception.NoLocationFoundException;
 import com.weather.weatherapp.repository.WeatherRepository;
@@ -10,11 +11,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +43,18 @@ class WeatherServiceTest {
             .windSpeed(6.17)
             .windDegree(250D)
             .dateTime(LocalDateTime.now())
+            .build();
+    private static final Forecast.ForecastDay FORECAST_DAY = Forecast.ForecastDay.builder()
+            .forecastDate(LocalDate.now().plusDays(1))
+            .temperature(27.26)
+            .pressure(1020D)
+            .humidity(62D)
+            .windSpeed(7.05)
+            .windDegree(101D)
+            .build();
+    private static final Forecast LOCATION_FORECAST = Forecast.builder()
+            .cityName(CITY_NAME)
+            .timezone("America/New_York")
             .build();
 
     @Mock
@@ -141,5 +157,56 @@ class WeatherServiceTest {
         assertThat(actual.get(0).getCityName()).isEqualTo("Miami");
         assertThat(actual.get(0).getTemperature()).isEqualTo(27.4);
         assertThat(actual.get(0).getWindDegree()).isEqualTo(250D);
+    }
+
+    @Test
+    void thatGetWeatherForecastWorksCorrectly() throws InterruptedException, IOException, NoLocationFoundException, URISyntaxException, InvalidDataException {
+        List<Forecast.ForecastDay> forecastDayList = new ArrayList<>();
+        forecastDayList.add(FORECAST_DAY);
+        forecastDayList.add(FORECAST_DAY);
+        LOCATION_FORECAST.setForecastDaysList(forecastDayList);
+
+        when(locationService.findLocationById(anyLong())).thenReturn(LOCATION);
+        when(weatherClient.getForecastForGeographicCoordinates(anyDouble(), anyDouble())).thenReturn(LOCATION_FORECAST);
+
+        final Forecast actual = service.getWeatherForecast(1L, LocalDate.now().plusDays(1).toString());
+
+        assertThat(actual).hasNoNullFieldsOrProperties();
+        assertThat(actual.getCityName()).isEqualTo(CITY_NAME);
+        assertThat(actual.getForecastDaysList()).hasSize(2);
+        assertThat(actual.getForecastDaysList().get(0).getTemperature()).isEqualTo(27.26);
+    }
+
+    @Test
+    void thatGetWeatherForecastThrowsNoLocationFoundException() throws NoLocationFoundException {
+        when(locationService.findLocationById(anyLong())).thenThrow(NoLocationFoundException.class);
+
+        Throwable throwable = Assertions.assertThrows(NoLocationFoundException.class, () -> service.getWeatherForecast(999L, LocalDate.now().plusDays(1).toString()));
+
+        assertThat(throwable).isExactlyInstanceOf(NoLocationFoundException.class);
+    }
+
+    @Test
+    void thatGetWeatherForecastThrowsIOException() throws NoLocationFoundException, InterruptedException, IOException, URISyntaxException {
+        when(locationService.findLocationById(anyLong())).thenReturn(LOCATION);
+        when(weatherClient.getForecastForGeographicCoordinates(anyDouble(), anyDouble())).thenThrow(IOException.class);
+
+        Throwable throwable = Assertions.assertThrows(IOException.class, () -> service.getWeatherForecast(999L, LocalDate.now().plusDays(1).toString()));
+
+        assertThat(throwable).isExactlyInstanceOf(IOException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"sdjfksdfs", "2021-02-03", "2021/02/16", "2021-02-28", "2020:01:12"})
+    void thatGetWeatherForecastThrowsInvalidDataException(String value) throws NoLocationFoundException, InterruptedException, IOException, URISyntaxException {
+        List<Forecast.ForecastDay> forecastDayList = new ArrayList<>();
+        forecastDayList.add(FORECAST_DAY);
+        LOCATION_FORECAST.setForecastDaysList(forecastDayList);
+        when(locationService.findLocationById(anyLong())).thenReturn(LOCATION);
+        when(weatherClient.getForecastForGeographicCoordinates(anyDouble(), anyDouble())).thenReturn(LOCATION_FORECAST);
+
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.getWeatherForecast(IDENTIFIER, value));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Wrong data provided");
     }
 }

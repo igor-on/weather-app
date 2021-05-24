@@ -198,14 +198,13 @@ public class UserInterface {
 
     private void getLocationForecast() {
         showAllSavedLocations();
-        System.out.println("Write location city name for which you want to check weather forecast");
-        scanner.nextLine();
-        final String selectedLocation = scanner.nextLine();
+        System.out.println("Write location id for which you want to check weather forecast");
+        final Long selectedId = scanner.nextLong();
         System.out.println("Select date for the forecast check(max 7 days +)(optional)");
         System.out.println("Required format: yyyy-MM-dd");
         final String selectedDate = scanner.nextLine();
         try {
-            System.out.println(weatherController.getLocationForecast(selectedLocation, selectedDate));
+            System.out.println(weatherController.getLocationForecast(selectedId, selectedDate));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             System.out.println("JSON NOOOO");

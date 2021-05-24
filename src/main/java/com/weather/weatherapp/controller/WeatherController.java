@@ -64,9 +64,9 @@ public class WeatherController {
         }
     }
 
-    public String getLocationForecast(String cityName, String selectedDate) throws JsonProcessingException {
+    public String getLocationForecast(Long id, String selectedDate) throws JsonProcessingException {
         try {
-            final Forecast weatherForecast = weatherService.getWeatherForecast(cityName, selectedDate);
+            final Forecast weatherForecast = weatherService.getWeatherForecast(id, selectedDate);
 
             final ForecastDTO weatherForecastDTO = mapToForecastDTO(weatherForecast);
 
