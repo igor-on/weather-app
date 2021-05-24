@@ -6,6 +6,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 public class WeatherRepository {
 
@@ -21,5 +23,17 @@ public class WeatherRepository {
         session.close();
 
         return locationWeather;
+    }
+
+    public List<Weather> findAll() {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+
+        List<Weather> allWeathers = session.createQuery("FROM Weather", Weather.class).getResultList();
+
+        transaction.commit();
+        session.close();
+
+        return allWeathers;
     }
 }

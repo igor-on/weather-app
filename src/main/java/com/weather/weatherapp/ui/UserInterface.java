@@ -23,6 +23,7 @@ public class UserInterface {
             System.out.println("3. Find localization data by city name");
             System.out.println("4. Show all saved localizations");
             System.out.println("5. Save current weather for available localizations");
+            System.out.println("6. Show all saved weathers");
             System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
@@ -41,6 +42,9 @@ public class UserInterface {
                     break;
                 case 5:
                     saveLocationCurrentWeather();
+                    break;
+                case 6:
+                    showAllSavedWeathers();
                     break;
                 case 0:
                     return;
@@ -125,6 +129,15 @@ public class UserInterface {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             System.out.println("JSON ERROR");
+        }
+    }
+
+    private void showAllSavedWeathers() {
+        try {
+            System.out.println(weatherController.showAllSavedWeathers());
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            System.out.println("JSON HOW DARE YOU");
         }
     }
 }

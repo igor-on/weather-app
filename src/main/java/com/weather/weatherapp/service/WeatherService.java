@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class WeatherService {
@@ -32,5 +33,9 @@ public class WeatherService {
                 = weatherClient.getWeatherForGeographicCoordinates(foundLocation.getLatitude(), foundLocation.getLongitude());
 
         return weatherRepository.save(foundLocationWeather);
+    }
+
+    public List<Weather> getAllLocationsWeathers() {
+        return weatherRepository.findAll();
     }
 }

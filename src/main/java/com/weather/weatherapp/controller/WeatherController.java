@@ -5,9 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.dto.current.WeatherDTO;
+import com.weather.weatherapp.mapper.WeatherDTOMapper;
 import com.weather.weatherapp.service.WeatherService;
 import com.weather.weatherapp.exception.Error;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.weather.weatherapp.mapper.WeatherDTOMapper.mapToWeatherDTO;
 
@@ -40,6 +44,20 @@ public class WeatherController {
             return mapper.writeValueAsString(locationWeatherDTO);
         } catch (Exception e) {
             return mapper.writeValueAsString(new Error(e.getMessage()));
+        }
+    }
+
+    public String showAllSavedWeathers() throws JsonProcessingException {
+        try {
+            final List<Weather> all = weatherService.getAllLocationsWeathers();
+
+            final List<WeatherDTO> mappedAll = all.stream()
+                    .map(WeatherDTOMapper::mapToWeatherDTO)
+                    .collect(Collectors.toList());
+
+            return mapper.writeValueAsString(mappedAll);
+        } catch (JsonProcessingException e) {
+            return mapper.writeValueAsString(new Error("Something went wrong :/"));
         }
     }
 }

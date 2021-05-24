@@ -16,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -125,5 +127,19 @@ class WeatherServiceTest {
         Throwable throwable = Assertions.assertThrows(IOException.class, () -> service.getAndSaveWeatherByGeographicCoordinates(anyLong()));
 
         assertThat(throwable).isExactlyInstanceOf(IOException.class);
+    }
+
+    @Test
+    void thatGetAllLocationsWeathersWorksCorrectly(){
+        List<Weather> weatherList = new ArrayList<>();
+        weatherList.add(LOCATION_WEATHER);
+        when(weatherRepository.findAll()).thenReturn(weatherList);
+
+        final List<Weather> actual = service.getAllLocationsWeathers();
+
+        assertThat(actual).hasSize(1);
+        assertThat(actual.get(0).getCityName()).isEqualTo("Miami");
+        assertThat(actual.get(0).getTemperature()).isEqualTo(27.4);
+        assertThat(actual.get(0).getWindDegree()).isEqualTo(250D);
     }
 }
