@@ -255,7 +255,7 @@ public class UserInterface {
                     System.out.println(fileController.writeLocationsToFile(fileName));
                     break;
                 case 2:
-                    System.out.println(fileController.writeLocationsWeathersToFile(fileName));
+                    System.out.println(fileController.writeWeathersToFile(fileName));
                     break;
                 default:
                     System.out.println("There's no option like this!");
@@ -280,7 +280,7 @@ public class UserInterface {
                     System.out.println(fileController.getLocationsDataFromFile(fileName));
                     break;
                 case 2:
-                    System.out.println(fileController.getLocationsWeathersDataFromFile(fileName));
+                    System.out.println(fileController.getWeathersDataFromFile(fileName));
                     break;
                 default:
                     System.out.println("There's no option like this!");

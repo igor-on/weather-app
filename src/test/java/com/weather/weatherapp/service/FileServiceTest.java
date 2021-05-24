@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,35 +84,83 @@ class FileServiceTest {
     }
 
     @Test
-    void thatWriteLocationsWeathersToFileWorksCorrectly() throws IOException, InvalidDataException {
+    void thatWriteWeathersToFileWorksCorrectly() throws IOException, InvalidDataException {
         List<Weather> locationList = new ArrayList<>();
         locationList.add(LOCATION_WEATHER);
         when(weatherService.getAllLocationsWeathers()).thenReturn(locationList);
 
-        final String actual = service.writeLocationsWeathersToFile(LOCATIONS_WEATHERS_FILE);
+        final String actual = service.writeWeathersToFile(LOCATIONS_WEATHERS_FILE);
 
         assertThat(actual).isEqualTo("Successfully wrote to file " + LOCATIONS_WEATHERS_FILE + ".json");
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"   ", "", "12345678901234567890123456789012345678901"})
-    void thatWriteLocationsWeathersToFileThrowsInvalidDataException(String value) {
+    void thatWriteWeathersToFileThrowsInvalidDataException(String value) {
         List<Weather> locationList = new ArrayList<>();
         locationList.add(LOCATION_WEATHER);
         when(weatherService.getAllLocationsWeathers()).thenReturn(locationList);
 
-        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.writeLocationsWeathersToFile(value));
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.writeWeathersToFile(value));
 
         assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given file name is incorrect");
     }
 
     @Test
-    void thatWriteLocationsWeathersToFileThrowsInvalidDataExceptionOnNull() {
+    void thatWriteWeathersToFileThrowsInvalidDataExceptionOnNull() {
         List<Weather> locationList = new ArrayList<>();
         locationList.add(LOCATION_WEATHER);
         when(weatherService.getAllLocationsWeathers()).thenReturn(locationList);
 
-        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.writeLocationsWeathersToFile(null));
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.writeWeathersToFile(null));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given file name is incorrect");
+    }
+
+    @Test
+    void thatGetLocationsFromFileWorksCorrectly() throws IOException, InvalidDataException {
+        doNothing().when(locationService).saveLocationListInDB(anyList());
+
+        final String actual = service.getLocationsFromFile(LOCATIONS_FILE);
+
+        assertThat(actual).isEqualTo("Successfully read from file " + LOCATIONS_FILE + ".json and saved in data base");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"   ", "", "12345678901234567890123456789012345678901"})
+    void thatGetLocationsFromFileThrowsInvalidException(String value) {
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.getLocationsFromFile(value));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given file name is incorrect");
+    }
+
+    @Test
+    void thatGetLocationsFromFileThrowsInvalidExceptionOnNull() {
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.getLocationsFromFile(null));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given file name is incorrect");
+    }
+
+    @Test
+    void thatGetWeathersFromFileWorksCorrectly() throws IOException, InvalidDataException {
+        doNothing().when(weatherService).saveWeatherListInDB(anyList());
+
+        final String actual = service.getWeathersFromFile(LOCATIONS_WEATHERS_FILE);
+
+        assertThat(actual).isEqualTo("Successfully read from file " + LOCATIONS_WEATHERS_FILE + ".json and saved in data base");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"   ", "", "12345678901234567890123456789012345678901"})
+    void thatGetWeathersFromFileThrowsInvalidException(String value) {
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.getWeathersFromFile(value));
+
+        assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given file name is incorrect");
+    }
+
+    @Test
+    void thatGetWeathersFromFileThrowsInvalidExceptionOnNull() {
+        Throwable throwable = Assertions.assertThrows(InvalidDataException.class, () -> service.getWeathersFromFile(null));
 
         assertThat(throwable).isExactlyInstanceOf(InvalidDataException.class).hasMessage("Given file name is incorrect");
     }

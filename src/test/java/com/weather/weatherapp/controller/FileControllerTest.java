@@ -56,28 +56,82 @@ class FileControllerTest {
     }
 
     @Test
-    void thatWriteLocationsWeathersToFileWorksCorrectly() throws IOException, InvalidDataException {
-        when(fileService.writeLocationsWeathersToFile(LOCATIONS_WEATHERS_FILE)).thenReturn("Successfully write to file " + LOCATIONS_WEATHERS_FILE + ".json");
+    void thatWriteWeathersToFileWorksCorrectly() throws IOException, InvalidDataException {
+        when(fileService.writeWeathersToFile(LOCATIONS_WEATHERS_FILE)).thenReturn("Successfully write to file " + LOCATIONS_WEATHERS_FILE + ".json");
 
-        final String actualJson = controller.writeLocationsWeathersToFile(LOCATIONS_WEATHERS_FILE);
+        final String actualJson = controller.writeWeathersToFile(LOCATIONS_WEATHERS_FILE);
 
         assertThat(actualJson).isEqualTo("Successfully write to file " + LOCATIONS_WEATHERS_FILE + ".json");
     }
 
     @Test
-    void thatWriteLocationsWeathersToFileThrowsIOException() throws IOException, InvalidDataException {
-        when(fileService.writeLocationsWeathersToFile(LOCATIONS_WEATHERS_FILE)).thenThrow(IOException.class);
+    void thatWriteWeathersToFileThrowsIOException() throws IOException, InvalidDataException {
+        when(fileService.writeWeathersToFile(LOCATIONS_WEATHERS_FILE)).thenThrow(IOException.class);
 
-        final String actualJson = controller.writeLocationsWeathersToFile(LOCATIONS_WEATHERS_FILE);
+        final String actualJson = controller.writeWeathersToFile(LOCATIONS_WEATHERS_FILE);
 
         assertThat(actualJson).contains("\"message\" : ");
     }
 
     @Test
-    void thatWriteLocationsWeathersToFileThrowsInvalidDataException() throws IOException, InvalidDataException {
-        when(fileService.writeLocationsWeathersToFile(LOCATIONS_WEATHERS_FILE)).thenThrow(InvalidDataException.class);
+    void thatWriteWeathersToFileThrowsInvalidDataException() throws IOException, InvalidDataException {
+        when(fileService.writeWeathersToFile(LOCATIONS_WEATHERS_FILE)).thenThrow(InvalidDataException.class);
 
-        final String actualJson = controller.writeLocationsWeathersToFile(LOCATIONS_WEATHERS_FILE);
+        final String actualJson = controller.writeWeathersToFile(LOCATIONS_WEATHERS_FILE);
+
+        assertThat(actualJson).contains("\"message\" : ");
+    }
+
+    @Test
+    void thatGetLocationsDataFromFileWorksCorrectly() throws IOException, InvalidDataException {
+        when(fileService.getLocationsFromFile(LOCATIONS_FILE)).thenReturn("Successfully read from file " + LOCATIONS_FILE + ".json and saved in data base");
+
+        final String actual = controller.getLocationsDataFromFile(LOCATIONS_FILE);
+
+        assertThat(actual).isEqualTo("Successfully read from file " + LOCATIONS_FILE + ".json and saved in data base");
+    }
+
+    @Test
+    void thatGetLocationsDataFromFileThrowsIOException() throws IOException, InvalidDataException {
+        when(fileService.getLocationsFromFile(LOCATIONS_WEATHERS_FILE)).thenThrow(IOException.class);
+
+        final String actualJson = controller.getLocationsDataFromFile(LOCATIONS_WEATHERS_FILE);
+
+        assertThat(actualJson).contains("\"message\" : \"Given objects from file can't be deserialized, wrong DTO\"");
+    }
+
+    @Test
+    void thatGetLocationsDataFromFileThrowsInvalidDataException() throws IOException, InvalidDataException {
+        when(fileService.getLocationsFromFile(anyString())).thenThrow(InvalidDataException.class);
+
+        final String actualJson = controller.getLocationsDataFromFile(LOCATIONS_FILE);
+
+        assertThat(actualJson).contains("\"message\" : ");
+    }
+
+    @Test
+    void thatGetWeathersDataFromFileWorksCorrectly() throws IOException, InvalidDataException {
+        when(fileService.getWeathersFromFile(LOCATIONS_WEATHERS_FILE)).thenReturn("Successfully read from file " + LOCATIONS_WEATHERS_FILE + ".json and saved in data base");
+
+        final String actual = controller.getWeathersDataFromFile(LOCATIONS_WEATHERS_FILE);
+
+        assertThat(actual).isEqualTo("Successfully read from file " + LOCATIONS_WEATHERS_FILE + ".json and saved in data base");
+    }
+
+    @Test
+    void thatGetWeathersDataFromFileThrowsIOException() throws IOException, InvalidDataException {
+        when(fileService.getWeathersFromFile(LOCATIONS_FILE)).thenThrow(IOException.class);
+
+        final String actualJson = controller.getWeathersDataFromFile(LOCATIONS_FILE);
+
+        assertThat(actualJson).contains("\"message\" : \"Given objects from file can't be deserialized, wrong DTO\"");
+    }
+
+    @Test
+    void thatGetWeathersDataFromFileThrowsInvalidDataException() throws IOException, InvalidDataException {
+        when(fileService.getWeathersFromFile(LOCATIONS_WEATHERS_FILE)).thenThrow(InvalidDataException.class);
+
+        final String actualJson = controller.getWeathersDataFromFile(LOCATIONS_WEATHERS_FILE);
 
         assertThat(actualJson).contains("\"message\" : ");
     }

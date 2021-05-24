@@ -24,9 +24,9 @@ public class FileController {
         }
     }
 
-    public String writeLocationsWeathersToFile(String fileName) throws JsonProcessingException {
+    public String writeWeathersToFile(String fileName) throws JsonProcessingException {
         try {
-            return fileService.writeLocationsWeathersToFile(fileName);
+            return fileService.writeWeathersToFile(fileName);
         } catch (Exception e) {
             return mapper.writeValueAsString(new Error(e.getMessage()));
         }
@@ -42,9 +42,9 @@ public class FileController {
         }
     }
 
-    public String getLocationsWeathersDataFromFile(String fileName) throws JsonProcessingException {
+    public String getWeathersDataFromFile(String fileName) throws JsonProcessingException {
         try {
-            return fileService.getLocationsWeathersFromFile(fileName);
+            return fileService.getWeathersFromFile(fileName);
         } catch (IOException e) {
             return mapper.writeValueAsString(new Error("Given objects from file can't be deserialized, wrong DTO"));
         } catch (Exception e) {

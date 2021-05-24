@@ -39,7 +39,7 @@ public class FileService {
         return getSuccessfulWriteMessage(file);
     }
 
-    public String writeLocationsWeathersToFile(String fileName) throws IOException, InvalidDataException {
+    public String writeWeathersToFile(String fileName) throws IOException, InvalidDataException {
         final List<Weather> allLocationsWeathers = weatherService.getAllLocationsWeathers();
         List<Weather> allLocationsWeathersCopy = new ArrayList<>(allLocationsWeathers);
 
@@ -66,7 +66,7 @@ public class FileService {
         return getSuccessfulReadMessage(file);
     }
 
-    public String getLocationsWeathersFromFile(String fileName) throws IOException, InvalidDataException {
+    public String getWeathersFromFile(String fileName) throws IOException, InvalidDataException {
         final File file = getJsonFile(fileName);
 
         final Weather[] locationsWeathers = mapper.readValue(file, Weather[].class);
