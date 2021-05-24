@@ -1,5 +1,6 @@
 package com.weather.weatherapp.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.weather.weatherapp.dto.Weather;
 import com.weather.weatherapp.exception.InvalidDataException;
 import com.weather.weatherapp.exception.NoLocationFoundException;
@@ -13,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -49,7 +52,7 @@ class WeatherControllerTest {
     }
 
     @Test
-    void thatAddSavedLocationWeatherByCityNameWorksCorrectly() throws InterruptedException, URISyntaxException, NoLocationFoundException, IOException, InvalidDataException {
+    void thatSaveLocationWeatherByCityNameWorksCorrectly() throws InterruptedException, URISyntaxException, NoLocationFoundException, IOException, InvalidDataException {
         when(weatherService.getAndSaveWeatherByCityName(CITY_NAME)).thenReturn(LOCATION_WEATHER);
 
         final String actualJson = controller.saveLocationWeatherByCityName(CITY_NAME);
@@ -65,7 +68,7 @@ class WeatherControllerTest {
     }
 
     @Test
-    void thatAddSavedLocationWeatherByCityNameThrowsNoLocationFoundException() throws IOException, InterruptedException, URISyntaxException, NoLocationFoundException, InvalidDataException {
+    void thatSaveLocationWeatherByCityNameThrowsNoLocationFoundException() throws IOException, InterruptedException, URISyntaxException, NoLocationFoundException, InvalidDataException {
         when(weatherService.getAndSaveWeatherByCityName(CITY_NAME)).thenThrow(new NoLocationFoundException("There is no location with given id: " + IDENTIFIER));
 
         final String actualJson = controller.saveLocationWeatherByCityName(CITY_NAME);
@@ -74,7 +77,7 @@ class WeatherControllerTest {
     }
 
     @Test
-    void thatAddSavedLocationWeatherByCityNameThrowsIOException() throws IOException, InterruptedException, URISyntaxException, NoLocationFoundException, InvalidDataException {
+    void thatSaveLocationWeatherByCityNameThrowsIOException() throws IOException, InterruptedException, URISyntaxException, NoLocationFoundException, InvalidDataException {
         when(weatherService.getAndSaveWeatherByCityName(CITY_NAME)).thenThrow(IOException.class);
 
         final String actualJson = controller.saveLocationWeatherByCityName(CITY_NAME);
@@ -83,7 +86,7 @@ class WeatherControllerTest {
     }
 
     @Test
-    void thatAddSavedLocationWeatherByCoordinatesWorksCorrectly() throws InterruptedException, URISyntaxException, NoLocationFoundException, IOException {
+    void thatSaveLocationWeatherByCoordinatesWorksCorrectly() throws InterruptedException, URISyntaxException, NoLocationFoundException, IOException {
         when(weatherService.getAndSaveWeatherByGeographicCoordinates(IDENTIFIER)).thenReturn(LOCATION_WEATHER);
 
         final String actualJson = controller.saveLocationWeatherByCoordinates(IDENTIFIER);
@@ -98,7 +101,7 @@ class WeatherControllerTest {
     }
 
     @Test
-    void thatAddSavedLocationWeatherByCoordsThrowsNoLocationException() throws IOException, InterruptedException, URISyntaxException, NoLocationFoundException {
+    void thatSaveLocationWeatherByCoordsThrowsNoLocationException() throws IOException, InterruptedException, URISyntaxException, NoLocationFoundException {
         when(weatherService.getAndSaveWeatherByGeographicCoordinates(IDENTIFIER)).thenThrow(new NoLocationFoundException("There is no location with given id: " + IDENTIFIER));
 
         final String actualJson = controller.saveLocationWeatherByCoordinates(IDENTIFIER);
@@ -107,11 +110,27 @@ class WeatherControllerTest {
     }
 
     @Test
-    void thatAddSavedLocationWeatherByCoordsThrowsIOException() throws IOException, InterruptedException, URISyntaxException, NoLocationFoundException {
+    void thatSaveLocationWeatherByCoordsThrowsIOException() throws IOException, InterruptedException, URISyntaxException, NoLocationFoundException {
         when(weatherService.getAndSaveWeatherByGeographicCoordinates(IDENTIFIER)).thenThrow(IOException.class);
 
         final String actualJson = controller.saveLocationWeatherByCoordinates(IDENTIFIER);
 
         assertThat(actualJson).contains("\"message\" : ");
+    }
+
+    @Test
+    void thatShowAllSavedWeathersWorksCorrectly() throws JsonProcessingException {
+        List<Weather> list = new ArrayList<>();
+        list.add(LOCATION_WEATHER);
+        when(weatherService.getAllLocationsWeathers()).thenReturn(list);
+
+        final String actualJson = controller.showAllSavedWeathers();
+
+        // LocationWeatherDTO - Json
+        assertThat(actualJson).contains("\"cityName\" : \"Miami\",");
+        assertThat(actualJson).contains("\"temperature\" : \"27.4\",");
+        assertThat(actualJson).contains("\"pressure\" : \"1019.0\",");
+        assertThat(actualJson).contains("\"humidity\" : \"54.0\",");
+        assertThat(actualJson).contains("\"windSpeed\" : \"6.17\",");
     }
 }
