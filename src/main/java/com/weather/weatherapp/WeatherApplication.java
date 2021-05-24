@@ -1,10 +1,12 @@
 package com.weather.weatherapp;
 
 import com.weather.weatherapp.client.WeatherClient;
+import com.weather.weatherapp.controller.FileController;
 import com.weather.weatherapp.controller.LocationController;
 import com.weather.weatherapp.controller.WeatherController;
 import com.weather.weatherapp.repository.LocationRepository;
 import com.weather.weatherapp.repository.WeatherRepository;
+import com.weather.weatherapp.service.FileService;
 import com.weather.weatherapp.service.LocationService;
 import com.weather.weatherapp.service.WeatherService;
 import com.weather.weatherapp.ui.UserInterface;
@@ -15,11 +17,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 public class WeatherApplication {
     public static void main(String[] args) {
-         StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+        StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
                 .configure()
                 .build();
 
-         SessionFactory sessionFactory = new MetadataSources(registry)
+        SessionFactory sessionFactory = new MetadataSources(registry)
                 .buildMetadata()
                 .buildSessionFactory();
 
@@ -30,8 +32,10 @@ public class WeatherApplication {
         final LocationController locationController = new LocationController(locationService);
         final WeatherService weatherService = new WeatherService(client, locationService, weatherRepository);
         final WeatherController weatherController = new WeatherController(weatherService);
+        final FileService fileService = new FileService(locationService, weatherService);
+        final FileController fileController = new FileController(fileService);
 
-        final UserInterface ui = new UserInterface(locationController, weatherController);
+        final UserInterface ui = new UserInterface(locationController, weatherController, fileController);
 
         ui.runApplication();
     }

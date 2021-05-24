@@ -1,6 +1,7 @@
 package com.weather.weatherapp.ui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.weather.weatherapp.controller.FileController;
 import com.weather.weatherapp.controller.LocationController;
 import com.weather.weatherapp.controller.WeatherController;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ public class UserInterface {
 
     private final LocationController locationController;
     private final WeatherController weatherController;
+    private final FileController fileController;
     private final Scanner scanner = new Scanner(System.in);
 
     public void runApplication() {
@@ -26,7 +28,9 @@ public class UserInterface {
             System.out.println("6. Show all saved weathers");
             System.out.println("7. Update localization");
             System.out.println("8. Get weather forecast for available localizations");
-            System.out.println("9. Get statistical weather for last month");
+            System.out.println("9. Get statistical weather from last month");
+            System.out.println("10. Write to Json file");
+            System.out.println("11. Get data from Json file");
             System.out.println("0. Close app");
 
             int userChoice = scanner.nextInt();
@@ -56,7 +60,13 @@ public class UserInterface {
                     getLocationForecast();
                     break;
                 case 9:
-                    getStatisticalData();
+                    getStatisticalWeather();
+                    break;
+                case 10:
+                    writeToFile();
+                    break;
+                case 11:
+                    getDataFromFile();
                     break;
                 case 0:
                     return;
@@ -215,7 +225,7 @@ public class UserInterface {
         }
     }
 
-    private void getStatisticalData() {
+    private void getStatisticalWeather() {
         showAllSavedWeathers();
         System.out.println("Write location city name for which you want to get statistical data");
         scanner.nextLine();
@@ -226,6 +236,57 @@ public class UserInterface {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             System.out.println("JOSOOON");
+        }
+    }
+
+
+    private void writeToFile() {
+        System.out.println("What are you want write to file?");
+        System.out.println("1) Saved locations");
+        System.out.println("2) Saved locations weathers");
+        final int userChoice = scanner.nextInt();
+        System.out.println("Select file name");
+        scanner.nextLine();
+        final String fileName = scanner.nextLine();
+
+        try {
+            switch (userChoice) {
+                case 1:
+                    System.out.println(fileController.writeLocationsToFile(fileName));
+                    break;
+                case 2:
+                    System.out.println(fileController.writeWeathersToFile(fileName));
+                    break;
+                default:
+                    System.out.println("There's no option like this!");
+            }
+        } catch (JsonProcessingException e) {
+            System.out.println("JSON STOP STOP");
+        }
+    }
+
+    private void getDataFromFile() {
+        System.out.println("What kind of data you want to read from file?");
+        System.out.println("1) Saved locations");
+        System.out.println("2) Saved locations weathers");
+        final int userChoice = scanner.nextInt();
+        System.out.println("Select file name");
+        scanner.nextLine();
+        String fileName = scanner.nextLine();
+
+        try {
+            switch (userChoice) {
+                case 1:
+                    System.out.println(fileController.getLocationsDataFromFile(fileName));
+                    break;
+                case 2:
+                    System.out.println(fileController.getWeathersDataFromFile(fileName));
+                    break;
+                default:
+                    System.out.println("There's no option like this!");
+            }
+        } catch (JsonProcessingException e) {
+            System.out.println("JSON PLEASE STOP");
         }
     }
 }
