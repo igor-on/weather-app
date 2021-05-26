@@ -21,19 +21,18 @@ public class LocationEndpoints {
     private final LocationController locationController;
     private final HttpServer server;
     private final HttpContext locationContext;
-    private final ObjectMapper mapper = new ObjectMapper()
-            .configure(SerializationFeature.INDENT_OUTPUT, true);
+    private final ObjectMapper mapper;
 
-    public LocationEndpoints(LocationController locationController, HttpServer server) {
+    public LocationEndpoints(LocationController locationController, HttpServer server, ObjectMapper mapper) {
         this.locationController = locationController;
         this.server = server;
-        locationContext = server.createContext("/location");
+        this.mapper = mapper;
+        locationContext = server.createContext("/locations");
     }
 
     public void runApp() throws JsonProcessingException {
         handleLocationContext();
         handleFindLocationContext();
-        handleUpdateContext();
     }
 
     public void handleLocationContext() throws JsonProcessingException {
@@ -79,6 +78,44 @@ public class LocationEndpoints {
                 out.write(resp.getBytes(StandardCharsets.UTF_8));
                 out.close();
             }
+            if(exchange.getRequestMethod().equals("PUT")){
+
+                final InputStream in = exchange.getRequestBody();
+                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+
+                final JsonNode root = mapper.readTree(reqJson);
+                final long id = root.get("id").asLong();
+
+                String resp = null;
+
+                if (root.has("cityName")) {
+
+                    final String cityName = root.get("cityName").asText();
+                    resp = locationController.updateLocationCityName(id, cityName);
+
+                } else if (root.has("latitude") && root.has("longitude")) {
+
+                    final double lat = root.get("latitude").asDouble();
+                    final double lon = root.get("longitude").asDouble();
+                    resp = locationController.updateLocationCoords(id, lat, lon);
+
+                } else if (root.has("region")) {
+
+                    final String region = root.get("region").asText();
+                    resp = locationController.updateLocationRegion(id, region);
+
+                } else if (root.has("country")) {
+
+                    final String country = root.get("country").asText();
+                    resp = locationController.updateLocationCountry(id, country);
+                }
+
+                assert resp != null;
+                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
+                final OutputStream out = exchange.getResponseBody();
+                out.write(resp.getBytes(StandardCharsets.UTF_8));
+                out.close();
+            }
 
             exchange.close();
         });
@@ -98,52 +135,6 @@ public class LocationEndpoints {
 
             final String resp = locationController.findLocationByCityName(cityName);
 
-            exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-            final OutputStream out = exchange.getResponseBody();
-            out.write(resp.getBytes(StandardCharsets.UTF_8));
-            out.close();
-            exchange.close();
-        });
-    }
-
-    public void handleUpdateContext() {
-        final HttpContext context = server.createContext("/update/location");
-
-        context.setHandler(exchange -> {
-            exchange.getResponseHeaders().add("Content-Type", "application/json");
-
-            final InputStream in = exchange.getRequestBody();
-            final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
-
-            final JsonNode root = mapper.readTree(reqJson);
-            final long id = root.get("id").asLong();
-
-            String resp = null;
-
-            if (root.has("cityName")) {
-
-                final String cityName = root.get("cityName").asText();
-                resp = locationController.updateLocationCityName(id, cityName);
-
-            } else if (root.has("latitude") && root.has("longitude")) {
-
-                final double lat = root.get("latitude").asDouble();
-                final double lon = root.get("longitude").asDouble();
-                resp = locationController.updateLocationCoords(id, lat, lon);
-
-            } else if (root.has("region")) {
-
-                final String region = root.get("region").asText();
-                resp = locationController.updateLocationRegion(id, region);
-
-            } else if (root.has("country")) {
-
-                final String country = root.get("country").asText();
-                resp = locationController.updateLocationCountry(id, country);
-
-            }
-
-            assert resp != null;
             exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
             final OutputStream out = exchange.getResponseBody();
             out.write(resp.getBytes(StandardCharsets.UTF_8));

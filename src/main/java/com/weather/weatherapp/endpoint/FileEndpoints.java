@@ -18,8 +18,7 @@ public class FileEndpoints {
 
     private final FileController fileController;
     private final HttpServer server;
-    private final ObjectMapper mapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT);
+    private final ObjectMapper mapper;
 
     public void runApp() {
         handleWriteToFile();
@@ -41,7 +40,7 @@ public class FileEndpoints {
             out.close();
             exchange.close();
         });
-        server.createContext("/locationsWeathers/writeToFile", exchange -> {
+        server.createContext("/weathers/writeToFile", exchange -> {
             final InputStream in = exchange.getRequestBody();
             final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
 
@@ -72,7 +71,7 @@ public class FileEndpoints {
             out.close();
             exchange.close();
         });
-        server.createContext("/locationsWeathers/readFromFile", exchange -> {
+        server.createContext("/weathers/readFromFile", exchange -> {
             final InputStream in = exchange.getRequestBody();
             final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
 

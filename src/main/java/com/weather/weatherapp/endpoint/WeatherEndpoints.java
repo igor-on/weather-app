@@ -19,8 +19,7 @@ public class WeatherEndpoints {
 
     private final WeatherController weatherController;
     private final HttpServer server;
-    private final ObjectMapper mapper = new ObjectMapper()
-            .configure(SerializationFeature.INDENT_OUTPUT, true);
+    private final ObjectMapper mapper;
 
     public void runApp() {
         handleLocationWeatherContext();
@@ -29,7 +28,7 @@ public class WeatherEndpoints {
     }
 
     public void handleLocationWeatherContext() {
-        server.createContext("/locationWeather", exchange -> {
+        server.createContext("/weathers", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
 
             if (exchange.getRequestMethod().equals("POST")) {
@@ -70,7 +69,7 @@ public class WeatherEndpoints {
     }
 
     public void handleLocationForecastContext() {
-        server.createContext("/locationForecast", exchange -> {
+        server.createContext("/forecast", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
 
             final InputStream in = exchange.getRequestBody();
@@ -91,7 +90,7 @@ public class WeatherEndpoints {
     }
 
     public void handleLocationStatisticsContext(){
-        server.createContext("/location/statistics", exchange -> {
+        server.createContext("/locations/statistics", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
 
             final InputStream in = exchange.getRequestBody();

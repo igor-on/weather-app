@@ -1,5 +1,6 @@
 package com.weather.weatherapp;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import com.weather.weatherapp.client.WeatherClient;
 import com.weather.weatherapp.controller.FileController;
@@ -45,9 +46,10 @@ public class WeatherApplication {
         final FileController fileController = new FileController(fileService);
 
 
-        final LocationEndpoints locationEndpoints = new LocationEndpoints(locationController, server);
-        final WeatherEndpoints weatherEndpoints = new WeatherEndpoints(weatherController, server);
-        final FileEndpoints fileEndpoints = new FileEndpoints(fileController, server);
+        final ObjectMapper mapper = new ObjectMapper();
+        final LocationEndpoints locationEndpoints = new LocationEndpoints(locationController, server, mapper);
+        final WeatherEndpoints weatherEndpoints = new WeatherEndpoints(weatherController, server, mapper);
+        final FileEndpoints fileEndpoints = new FileEndpoints(fileController, server, mapper);
 
         locationEndpoints.runApp();
         weatherEndpoints.runApp();
