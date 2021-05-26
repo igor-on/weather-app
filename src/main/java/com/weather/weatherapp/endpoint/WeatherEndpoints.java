@@ -2,7 +2,6 @@ package com.weather.weatherapp.endpoint;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sun.net.httpserver.HttpServer;
 import com.weather.weatherapp.controller.WeatherController;
 import lombok.RequiredArgsConstructor;
@@ -53,8 +52,7 @@ public class WeatherEndpoints {
                 final OutputStream out = exchange.getResponseBody();
                 out.write(resp.getBytes(StandardCharsets.UTF_8));
                 out.close();
-            }
-            if (exchange.getRequestMethod().equals("GET")) {
+            } else if (exchange.getRequestMethod().equals("GET")) {
 
                 final String resp = weatherController.showAllSavedWeathers();
 
@@ -62,8 +60,9 @@ public class WeatherEndpoints {
                 final OutputStream out = exchange.getResponseBody();
                 out.write(resp.getBytes(StandardCharsets.UTF_8));
                 out.close();
+            } else {
+                exchange.sendResponseHeaders(405, 0);
             }
-
             exchange.close();
         });
     }
@@ -71,6 +70,8 @@ public class WeatherEndpoints {
     public void handleLocationForecastContext() {
         server.createContext("/forecast", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
+
+            if(exchange.getRequestMethod().equals("POST")){
 
             final InputStream in = exchange.getRequestBody();
             final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
@@ -85,6 +86,9 @@ public class WeatherEndpoints {
             final OutputStream out = exchange.getResponseBody();
             out.write(resp.getBytes(StandardCharsets.UTF_8));
             out.close();
+            } else {
+                exchange.sendResponseHeaders(405, 0);
+            }
             exchange.close();
         });
     }
@@ -92,6 +96,9 @@ public class WeatherEndpoints {
     public void handleLocationStatisticsContext(){
         server.createContext("/locations/statistics", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
+
+            if(exchange.getRequestMethod().equals("POST")){
+
 
             final InputStream in = exchange.getRequestBody();
             final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
@@ -105,6 +112,9 @@ public class WeatherEndpoints {
             final OutputStream out = exchange.getResponseBody();
             out.write(resp.getBytes(StandardCharsets.UTF_8));
             out.close();
+            } else {
+                exchange.sendResponseHeaders(405, 0);
+            }
             exchange.close();
         });
     }

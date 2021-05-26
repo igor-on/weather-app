@@ -3,7 +3,6 @@ package com.weather.weatherapp.endpoint;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import com.weather.weatherapp.controller.LocationController;
@@ -39,84 +38,92 @@ public class LocationEndpoints {
         locationContext.setHandler(exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
 
-            if (exchange.getRequestMethod().equals("POST")) {
-                final InputStream in = exchange.getRequestBody();
+            switch (exchange.getRequestMethod()) {
+                case "POST": {
+                    final InputStream in = exchange.getRequestBody();
 
-                //Zczytywanie request body(InputStream) do stringa
-                String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
-                final Location location = mapper.readValue(reqJson, Location.class);
+                    //Zczytywanie request body(InputStream) do stringa
+                    String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                    final Location location = mapper.readValue(reqJson, Location.class);
 
-                //Logika programu zwracająca response
-                final String resp = locationController.addLocation(location.getCityName(), location.getLatitude(), location.getLongitude(), location.getRegion(), location.getCountry());
+                    //Logika programu zwracająca response
+                    final String resp = locationController.addLocation(location.getCityName(), location.getLatitude(), location.getLongitude(), location.getRegion(), location.getCountry());
 
-                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
-            }
-            if (exchange.getRequestMethod().equals("GET")) {
-
-                final String resp = locationController.showAllSavedLocations();
-
-                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
-            }
-            if (exchange.getRequestMethod().equals("DELETE")) {
-
-                final InputStream in = exchange.getRequestBody();
-                String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
-
-                final JsonNode root = mapper.readTree(reqJson);
-                final long id = root.get("id").asLong();
-
-                final String resp = locationController.removeLocation(id);
-
-                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
-            }
-            if(exchange.getRequestMethod().equals("PUT")){
-
-                final InputStream in = exchange.getRequestBody();
-                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
-
-                final JsonNode root = mapper.readTree(reqJson);
-                final long id = root.get("id").asLong();
-
-                String resp = null;
-
-                if (root.has("cityName")) {
-
-                    final String cityName = root.get("cityName").asText();
-                    resp = locationController.updateLocationCityName(id, cityName);
-
-                } else if (root.has("latitude") && root.has("longitude")) {
-
-                    final double lat = root.get("latitude").asDouble();
-                    final double lon = root.get("longitude").asDouble();
-                    resp = locationController.updateLocationCoords(id, lat, lon);
-
-                } else if (root.has("region")) {
-
-                    final String region = root.get("region").asText();
-                    resp = locationController.updateLocationRegion(id, region);
-
-                } else if (root.has("country")) {
-
-                    final String country = root.get("country").asText();
-                    resp = locationController.updateLocationCountry(id, country);
+                    exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
+                    final OutputStream out = exchange.getResponseBody();
+                    out.write(resp.getBytes(StandardCharsets.UTF_8));
+                    out.close();
+                    break;
                 }
+                case "GET": {
 
-                assert resp != null;
-                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
+                    final String resp = locationController.showAllSavedLocations();
+
+                    exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
+                    final OutputStream out = exchange.getResponseBody();
+                    out.write(resp.getBytes(StandardCharsets.UTF_8));
+                    out.close();
+                    break;
+                }
+                case "DELETE": {
+
+                    final InputStream in = exchange.getRequestBody();
+                    String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+
+                    final JsonNode root = mapper.readTree(reqJson);
+                    final long id = root.get("id").asLong();
+
+                    final String resp = locationController.removeLocation(id);
+
+                    exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
+                    final OutputStream out = exchange.getResponseBody();
+                    out.write(resp.getBytes(StandardCharsets.UTF_8));
+                    out.close();
+                    break;
+                }
+                case "PUT": {
+
+                    final InputStream in = exchange.getRequestBody();
+                    final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+
+                    final JsonNode root = mapper.readTree(reqJson);
+                    final long id = root.get("id").asLong();
+
+                    String resp = null;
+
+                    if (root.has("cityName")) {
+
+                        final String cityName = root.get("cityName").asText();
+                        resp = locationController.updateLocationCityName(id, cityName);
+
+                    } else if (root.has("latitude") && root.has("longitude")) {
+
+                        final double lat = root.get("latitude").asDouble();
+                        final double lon = root.get("longitude").asDouble();
+                        resp = locationController.updateLocationCoords(id, lat, lon);
+
+                    } else if (root.has("region")) {
+
+                        final String region = root.get("region").asText();
+                        resp = locationController.updateLocationRegion(id, region);
+
+                    } else if (root.has("country")) {
+
+                        final String country = root.get("country").asText();
+                        resp = locationController.updateLocationCountry(id, country);
+                    }
+
+                    assert resp != null;
+                    exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
+                    final OutputStream out = exchange.getResponseBody();
+                    out.write(resp.getBytes(StandardCharsets.UTF_8));
+                    out.close();
+                    break;
+                }
+                default:
+                    exchange.sendResponseHeaders(405, 0);
+                    break;
             }
-
             exchange.close();
         });
     }
@@ -126,6 +133,8 @@ public class LocationEndpoints {
 //        final HttpContext context = server.createContext(String.format("location/&s", String.class));
 
         context.setHandler(exchange -> {
+
+            if(exchange.getRequestMethod().equals("POST")){
 
             final InputStream in = exchange.getRequestBody();
             final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
@@ -139,6 +148,9 @@ public class LocationEndpoints {
             final OutputStream out = exchange.getResponseBody();
             out.write(resp.getBytes(StandardCharsets.UTF_8));
             out.close();
+            } else {
+                exchange.sendResponseHeaders(405, 0);
+            }
             exchange.close();
         });
     }
