@@ -7,7 +7,7 @@ REST API weather app created using Java 11 and Hibernate only, additionally a te
 * [Technologies](#technologies)
 * [Setup](#setup)
 
-##What you can do in this app
+## What you can do in this app
 * CRUD methods for locations
 * find location by city name
 ### After you add some locations:
@@ -17,7 +17,7 @@ REST API weather app created using Java 11 and Hibernate only, additionally a te
 ### Once you store few locations in data:
 * write these to Json file for later usage
 * later usage has come, read data from Json file and start again!
-##Prepared endpoints
+## Prepared endpoints
 * /locations GET POST
 * /locations/{cityname}
 * /locations/{id} DELETE  
