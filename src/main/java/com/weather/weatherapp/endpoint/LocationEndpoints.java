@@ -31,7 +31,7 @@ public class LocationEndpoints {
 
     public void runApp() throws JsonProcessingException {
         handleLocationContext();
-        handleFindLocationContext();
+        handleBetterFindLocationContext();
     }
 
     public void handleLocationContext() throws JsonProcessingException {
@@ -56,8 +56,20 @@ public class LocationEndpoints {
                     break;
                 }
                 case "GET": {
+                    final String[] splitUri = exchange.getRequestURI().toString().split("/");
 
-                    final String resp = locationController.showAllSavedLocations();
+                    String resp;
+
+                    if (splitUri.length > 3) {
+                        exchange.sendResponseHeaders(400, 0);
+                    }
+                    if (splitUri.length == 2) {
+                        resp = locationController.showAllSavedLocations();
+                    } else {
+                        final String cityName = splitUri[2];
+                        resp = locationController.findLocationByCityName(cityName);
+                    }
+
 
                     exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
                     final OutputStream out = exchange.getResponseBody();
@@ -66,12 +78,12 @@ public class LocationEndpoints {
                     break;
                 }
                 case "DELETE": {
+                    final String[] splitUri = exchange.getRequestURI().toString().split("/");
 
-                    final InputStream in = exchange.getRequestBody();
-                    String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
-
-                    final JsonNode root = mapper.readTree(reqJson);
-                    final long id = root.get("id").asLong();
+                    if(splitUri.length  > 3){
+                        exchange.sendResponseHeaders(400, 0);
+                    }
+                    final long id = Long.parseLong(splitUri[2]);
 
                     final String resp = locationController.removeLocation(id);
 
@@ -128,29 +140,25 @@ public class LocationEndpoints {
         });
     }
 
-    public void handleFindLocationContext() {
-        final HttpContext context = server.createContext("/findLocation");
-//        final HttpContext context = server.createContext(String.format("location/&s", String.class));
+    public void handleBetterFindLocationContext() {
+        server.createContext("/location", exchange -> {
+            exchange.getResponseHeaders().add("Content-Type", "application/json");
+            final String uri = exchange.getRequestURI().toString();
 
-        context.setHandler(exchange -> {
+            final String[] split = uri.split("/");
+            if (split.length > 3) {
+                exchange.sendResponseHeaders(404, 0);
+            }
 
-            if(exchange.getRequestMethod().equals("POST")){
+            final String cityName = split[2];
 
-            final InputStream in = exchange.getRequestBody();
-            final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
-
-            final JsonNode root = mapper.readTree(reqJson);
-            final String cityName = root.get("cityName").asText();
-
-            final String resp = locationController.findLocationByCityName(cityName);
+            System.out.println(cityName);
+            String resp = locationController.findLocationByCityName(cityName);
 
             exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
             final OutputStream out = exchange.getResponseBody();
             out.write(resp.getBytes(StandardCharsets.UTF_8));
             out.close();
-            } else {
-                exchange.sendResponseHeaders(405, 0);
-            }
             exchange.close();
         });
     }
