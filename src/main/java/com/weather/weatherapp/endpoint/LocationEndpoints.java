@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import com.weather.weatherapp.controller.LocationController;
 import com.weather.weatherapp.dto.Location;
+import lombok.RequiredArgsConstructor;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -15,26 +16,19 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class LocationEndpoints {
 
     private final LocationController locationController;
     private final HttpServer server;
-    private final HttpContext locationContext;
     private final ObjectMapper mapper;
-
-    public LocationEndpoints(LocationController locationController, HttpServer server, ObjectMapper mapper) {
-        this.locationController = locationController;
-        this.server = server;
-        this.mapper = mapper;
-        locationContext = server.createContext("/locations");
-    }
 
     public void runApp() throws JsonProcessingException {
         handleLocationContext();
-        handleBetterFindLocationContext();
     }
 
     public void handleLocationContext() throws JsonProcessingException {
+        final HttpContext locationContext = server.createContext("/locations");
         locationContext.setHandler(exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
 
@@ -69,7 +63,6 @@ public class LocationEndpoints {
                         final String cityName = splitUri[2];
                         resp = locationController.findLocationByCityName(cityName);
                     }
-
 
                     exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
                     final OutputStream out = exchange.getResponseBody();
@@ -136,29 +129,6 @@ public class LocationEndpoints {
                     exchange.sendResponseHeaders(405, 0);
                     break;
             }
-            exchange.close();
-        });
-    }
-
-    public void handleBetterFindLocationContext() {
-        server.createContext("/location", exchange -> {
-            exchange.getResponseHeaders().add("Content-Type", "application/json");
-            final String uri = exchange.getRequestURI().toString();
-
-            final String[] split = uri.split("/");
-            if (split.length > 3) {
-                exchange.sendResponseHeaders(404, 0);
-            }
-
-            final String cityName = split[2];
-
-            System.out.println(cityName);
-            String resp = locationController.findLocationByCityName(cityName);
-
-            exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-            final OutputStream out = exchange.getResponseBody();
-            out.write(resp.getBytes(StandardCharsets.UTF_8));
-            out.close();
             exchange.close();
         });
     }

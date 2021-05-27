@@ -71,21 +71,21 @@ public class WeatherEndpoints {
         server.createContext("/forecast", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
 
-            if(exchange.getRequestMethod().equals("POST")){
+            if (exchange.getRequestMethod().equals("POST")) {
 
-            final InputStream in = exchange.getRequestBody();
-            final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                final InputStream in = exchange.getRequestBody();
+                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
 
-            final JsonNode root = mapper.readTree(reqJson);
-            final Long id = root.get("id").asLong();
-            final String selectedDate = root.get("selectedDate").asText();
+                final JsonNode root = mapper.readTree(reqJson);
+                final Long id = root.get("id").asLong();
+                final String selectedDate = root.get("selectedDate").asText();
 
-            final String resp = weatherController.getLocationForecast(id, selectedDate);
+                final String resp = weatherController.getLocationForecast(id, selectedDate);
 
-            exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-            final OutputStream out = exchange.getResponseBody();
-            out.write(resp.getBytes(StandardCharsets.UTF_8));
-            out.close();
+                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
+                final OutputStream out = exchange.getResponseBody();
+                out.write(resp.getBytes(StandardCharsets.UTF_8));
+                out.close();
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
@@ -93,25 +93,24 @@ public class WeatherEndpoints {
         });
     }
 
-    public void handleLocationStatisticsContext(){
-        server.createContext("/locations/statistics", exchange -> {
+    public void handleLocationStatisticsContext() {
+        server.createContext("/statistics", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
 
-            if(exchange.getRequestMethod().equals("POST")){
+            if (exchange.getRequestMethod().equals("GET")) {
+                final String[] splitUri = exchange.getRequestURI().toString().split("/");
 
+                if (splitUri.length > 3) {
+                    exchange.sendResponseHeaders(400, 0);
+                }
+                final String cityName = splitUri[2];
 
-            final InputStream in = exchange.getRequestBody();
-            final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                final String resp = weatherController.getLocationWeatherStatisticalData(cityName);
 
-            final JsonNode root = mapper.readTree(reqJson);
-            final String cityName = root.get("cityName").asText();
-
-            final String resp = weatherController.getLocationWeatherStatisticalData(cityName);
-
-            exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-            final OutputStream out = exchange.getResponseBody();
-            out.write(resp.getBytes(StandardCharsets.UTF_8));
-            out.close();
+                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
+                final OutputStream out = exchange.getResponseBody();
+                out.write(resp.getBytes(StandardCharsets.UTF_8));
+                out.close();
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
