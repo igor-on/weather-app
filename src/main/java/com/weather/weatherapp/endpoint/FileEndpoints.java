@@ -3,14 +3,10 @@ package com.weather.weatherapp.endpoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import com.weather.weatherapp.controller.FileController;
+import com.weather.weatherapp.endpoint.utils.HTTPExchangeUtils;
 import lombok.RequiredArgsConstructor;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class FileEndpoints {
@@ -28,17 +24,14 @@ public class FileEndpoints {
         server.createContext("/locations/writeToFile", exchange -> {
             if (exchange.getRequestMethod().equals("POST")) {
 
-                final InputStream in = exchange.getRequestBody();
-                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                final String reqJson = HTTPExchangeUtils.convertRequestBodyToString(exchange);
 
                 final String fileName = mapper.readTree(reqJson).get("fileName").asText();
 
                 final String resp = fileController.writeLocationsToFile(fileName);
 
                 exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
+                HTTPExchangeUtils.sendResponseBodyToUser(exchange, resp);
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
@@ -47,17 +40,14 @@ public class FileEndpoints {
         server.createContext("/weathers/writeToFile", exchange -> {
             if (exchange.getRequestMethod().equals("POST")) {
 
-                final InputStream in = exchange.getRequestBody();
-                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                final String reqJson = HTTPExchangeUtils.convertRequestBodyToString(exchange);
 
                 final String fileName = mapper.readTree(reqJson).get("fileName").asText();
 
                 final String resp = fileController.writeWeathersToFile(fileName);
 
                 exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
+                HTTPExchangeUtils.sendResponseBodyToUser(exchange, resp);
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
@@ -69,17 +59,14 @@ public class FileEndpoints {
         server.createContext("/locations/readFromFile", exchange -> {
             if (exchange.getRequestMethod().equals("POST")) {
 
-                final InputStream in = exchange.getRequestBody();
-                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                final String reqJson = HTTPExchangeUtils.convertRequestBodyToString(exchange);
 
                 final String fileName = mapper.readTree(reqJson).get("fileName").asText();
 
                 final String resp = fileController.getLocationsDataFromFile(fileName);
 
                 exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
+                HTTPExchangeUtils.sendResponseBodyToUser(exchange, resp);
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
@@ -88,17 +75,14 @@ public class FileEndpoints {
         server.createContext("/weathers/readFromFile", exchange -> {
             if (exchange.getRequestMethod().equals("POST")) {
 
-                final InputStream in = exchange.getRequestBody();
-                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                final String reqJson = HTTPExchangeUtils.convertRequestBodyToString(exchange);
 
                 final String fileName = mapper.readTree(reqJson).get("fileName").asText();
 
                 final String resp = fileController.getWeathersDataFromFile(fileName);
 
                 exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
+                HTTPExchangeUtils.sendResponseBodyToUser(exchange, resp);
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }

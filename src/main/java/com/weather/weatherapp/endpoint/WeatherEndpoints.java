@@ -4,14 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpServer;
 import com.weather.weatherapp.controller.WeatherController;
+import com.weather.weatherapp.endpoint.utils.HTTPExchangeUtils;
 import lombok.RequiredArgsConstructor;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class WeatherEndpoints {
@@ -30,14 +26,13 @@ public class WeatherEndpoints {
         server.createContext("/weathers", exchange -> {
             exchange.getResponseHeaders().add("Content-Type", "application/json");
 
+            String resp = null;
+
             if (exchange.getRequestMethod().equals("POST")) {
 
-                final InputStream in = exchange.getRequestBody();
-                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                final String reqJson = HTTPExchangeUtils.convertRequestBodyToString(exchange);
 
                 final JsonNode root = mapper.readTree(reqJson);
-
-                String resp = null;
 
                 if (root.has("cityName")) {
                     final String cityName = root.get("cityName").asText();
@@ -47,22 +42,17 @@ public class WeatherEndpoints {
                     resp = weatherController.saveLocationWeatherByCoordinates(id);
                 }
 
-                assert resp != null;
-                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
             } else if (exchange.getRequestMethod().equals("GET")) {
-
-                final String resp = weatherController.showAllSavedWeathers();
-
-                exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
+                resp = weatherController.showAllSavedWeathers();
             } else {
                 exchange.sendResponseHeaders(405, 0);
+                exchange.close();
+                return;
             }
+
+            assert resp != null;
+            exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
+            HTTPExchangeUtils.sendResponseBodyToUser(exchange, resp);
             exchange.close();
         });
     }
@@ -73,8 +63,7 @@ public class WeatherEndpoints {
 
             if (exchange.getRequestMethod().equals("POST")) {
 
-                final InputStream in = exchange.getRequestBody();
-                final String reqJson = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).lines().collect(Collectors.joining());
+                final String reqJson = HTTPExchangeUtils.convertRequestBodyToString(exchange);
 
                 final JsonNode root = mapper.readTree(reqJson);
                 final Long id = root.get("id").asLong();
@@ -83,9 +72,7 @@ public class WeatherEndpoints {
                 final String resp = weatherController.getLocationForecast(id, selectedDate);
 
                 exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
+                HTTPExchangeUtils.sendResponseBodyToUser(exchange, resp);
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
@@ -108,9 +95,7 @@ public class WeatherEndpoints {
                 final String resp = weatherController.getLocationWeatherStatisticalData(cityName);
 
                 exchange.sendResponseHeaders(200, resp.getBytes(StandardCharsets.UTF_8).length);
-                final OutputStream out = exchange.getResponseBody();
-                out.write(resp.getBytes(StandardCharsets.UTF_8));
-                out.close();
+                HTTPExchangeUtils.sendResponseBodyToUser(exchange, resp);
             } else {
                 exchange.sendResponseHeaders(405, 0);
             }
