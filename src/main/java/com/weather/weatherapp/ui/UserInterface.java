@@ -239,7 +239,6 @@ public class UserInterface {
         }
     }
 
-
     private void writeToFile() {
         System.out.println("What are you want write to file?");
         System.out.println("1) Saved locations");
