@@ -1,13 +1,13 @@
 # WEATHER APP
 
-REST API weather app created using Java 11 and Hibernate only, additionally a terminal UI
+REST API weather app created using Java 11 and Hibernate only, additionally a terminal UI              
 
 ## TABLE OF CONTENTS
 
-* [What you can do in this app](#what-you-can-do)
+* [What you can do in this app](#what-you-can-do-in-this-app)
 * [Prepared enpoints](#prepared-endpoints)
 * [Technologies](#technologies)
-* [Setup](#setup)
+* [How to start](#how-to-start)
 
 ## What you can do in this app
 
@@ -59,6 +59,7 @@ The request body needs to be in Json format
   ```  
 * DELETE `/locations/{id}`
 * GET`/locations/{cityname}`
+* GET `/weathers`  
 * POST `/weathers`
   ##### Example:
    ```
@@ -105,7 +106,7 @@ git clone https://github.com/igor-on/weather-app.git
 
 ### After you clone repository
 
-* You need to create the appropriate tables in mySql data base and add credentials in hibernate.cfg.xml file
-* Then you need to add your API keys in URILibrary class
+* You need to create the appropriate tables in mySql data base and add credentials in *hibernate.cfg.xml* file
+* Then you need to add your API keys in *URILibrary* class
     * FIRST_API_KEY - OpenWeatherMap
     * SECOND_API_KEY - WeatherStack 
